@@ -1,0 +1,32 @@
+## List of addresses to which Mixmaster will deliver, even in middleman mode
+## Beware: substring matches
+
+##
+## allowed destinations
+##
+
+## Allows mail to *@example.com
+#/@example\.com$/
+
+## Matches *myaddress@example.net*
+#myaddress@example.net
+
+## Allows direct posts to alt.test and alt.anonymous.messages
+## (only mix posts unless mail2news@ is whitelisted, too)
+#/^Newsgroups: +(alt\.test|alt\.anonymous\.messages)$/
+
+
+##
+## nymservers
+##
+/@nym\.mixmin\.net$/
+/@mixnym\.net$/
+/@is-not-my\.name$/
+/@dizum\.nl$/
+
+##
+## Some (not all) pingers
+##
+/^echolot\+/
+/^pinger\+/
+/^estragon\+.+@frell\.theremailer\.net$/

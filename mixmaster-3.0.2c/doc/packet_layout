@@ -1,0 +1,14 @@
+The RSA encryption occupies space equal to the modulus which is
+from 128 bytes for 1024-bit to 512 bytes for 4096-bit.
+
+Data encrypted under RSA with the larger keys is (with sizes in bytes):
+24    3deskey (unchanged from older software)
+64    hmac_key for HMAC-SHA256
+32    hmac(2*512 of later header data) to prevent tagging
+32    hmac(body)
+32    hmac(328block) current header data a.k.a TTE standing for three,two,eight
+32    aes_pre_key
+
+The aes_pre_key is used together with HMAC-SHA256 to generate the 3
+AES keys for the body, future headers and the current header data of 
+size 328.
