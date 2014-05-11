@@ -20,6 +20,7 @@ int menu_getuserpass(BUFFER *p, int mode) { return 0; };
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "menu.h"
 #ifdef WIN32
