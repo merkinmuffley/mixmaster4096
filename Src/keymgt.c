@@ -13,6 +13,7 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
+#include <unistd.h>
 
 int getv2seckey(byte keyid[], BUFFER *key);
 static int getv2pubkey(byte keyid[], BUFFER *key);
