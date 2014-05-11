@@ -102,6 +102,7 @@ static int isnewid(BUFFER *id, char rsa1234, long timestamp)
 
   if (REMAIL == 0)
     return (1); /* don't keep statistics for the client */
+  if ((rsa1234<1) || (rsa1234>4)) return(1);
 
   now = time(NULL);
 
@@ -182,7 +183,7 @@ static int isnewid(BUFFER *id, char rsa1234, long timestamp)
     now_day = now/SECONDSPERDAY;
     if (old_day == now_day) {
         /* add current item to stats  */
-        rs.r[rsa1234]++;
+        rs.r[(int)rsa1234]++;
         fwrite(&rs,1,sizeof(rs),rf);
     } else {
         /* write text and restart the daily file */
@@ -216,7 +217,7 @@ static int isnewid(BUFFER *id, char rsa1234, long timestamp)
         }
         memset(&rs, 0, sizeof(rs));
         rs.time = now_day * SECONDSPERDAY;
-        rs.r[rsa1234]++;
+        rs.r[(int)rsa1234]++;
         fwrite(&rs,1,sizeof(rs),rf);
     }
   }
@@ -427,7 +428,7 @@ int mix2_decrypt(BUFFER *m)
   dec->length = dec->ptr - 16;	/* ignore digest */
   dec->ptr = dec->length;
   /* If using 1024-bit RSA this is the only integrity protection.
-     (It is still present but less important with larger key sizes.)
+     (It is still present but less important with larger key sizes.) */
   if (!isdigest_md5(dec, digest)) {
     errlog(NOTICE, "Message digest does not match.\n");
     err = -1;
