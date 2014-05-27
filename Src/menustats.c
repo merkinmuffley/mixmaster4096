@@ -41,20 +41,36 @@ int url_download(char *url, char *dest) {
   else
     return 0;
 #else
+  int i;
   {
       pid_t pid;
+      int whatprog[2];  /* to indicate outcome of external program to parent process */
+      char tmpwhatprog[10];
       if (0 != strncmp(url, "http", 4)) {
           /* url should start "http" */
-          errlog(ERRORMSG, "refusing external program %s with url=%s dest=%s\n", WGET, url, dest);
+          errlog(ERRORMSG, "refusing external web program with url=%s dest=%s\n", url, dest);
           return 1;
       }
-      errlog(LOG, "calling external program %s with url=%s dest=%s\n", WGET, url, dest);
+      if (pipe(whatprog)) {
+          errlog(ERRORMSG, "pipe failed\n");
+          return 1;
+      }
       pid=fork();
       if (!pid) {
           char *narg[10];
-          /* arguments for wget process called with execvp() NOT system()
+          close(whatprog[0]);
+          /* arguments for  curl or wget process called with execvp() NOT system()
              https://www.owasp.org/index.php/Injection_Flaws
           */
+          narg[0]="curl";
+          narg[1]="-s";
+          narg[2]=url;
+          narg[3]="-o";
+          narg[4]=dest;
+          narg[5]=(char *) 0;
+          execvp("curl", narg);
+	   /* If curl fails use wget as second choice. */
+	  write(whatprog[1], narg[0], 1);
           narg[0]=WGET;
           narg[1]="-q";
           narg[2]=url;
@@ -62,13 +78,33 @@ int url_download(char *url, char *dest) {
           narg[4]=dest;
           narg[5]=(char *) 0;
           execvp(WGET, narg);
+	  write(whatprog[1], narg[0], 1);
           exit(1);
       }
+      close(whatprog[1]);
       waitpid(pid, &err, 0);
+      i=read(whatprog[0], tmpwhatprog, 3);
+      switch(i) {
+	      case -1:
+                errlog(LOG, "read error on pipe in menustats.c\n");
+		break;
+	      case 0:
+                errlog(LOG, "called external program curl with url=%s dest=%s\n", url, dest);
+		break;
+	      case 1:
+                errlog(LOG, "called external program wget with url=%s dest=%s\n", url, dest);
+		break;
+	      case 2:
+                errlog(LOG, "called no external program to get url=%s\n", url);
+		break;
+	      default:
+                errlog(LOG, "confused in menustats.c\n");
+		break;
+      }
   }
 
-  if (WIFEXITED(err) == 0) {
-      errlog(ERRORMSG, "failure of %s\n", WGET);
+  if ((i<=2) && WIFEXITED(err) == 0) {
+      errlog(ERRORMSG, "failure of external program\n");
       return -1; /* abnormal child exit */
   } else
       return 0;
