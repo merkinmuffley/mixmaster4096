@@ -663,6 +663,12 @@ limits the number of allowed recipients in outgoing mail.  Anything that exceeds
 number is dropped silently.  Default:
 .BR 5 .
 .TP
+.B KEYLEN
+Define the default Mixmaster key length.  This can be overridden by using --size in
+combination with --generate-key.
+Acceptable values are: 1=1024, 2=2048, 3=3072, 4=4096.  Default:
+.BR 1 .
+.TP
 .B TEMP_FAIL
 exit with this exit code when a timeskew problem is suspected.  Also see
 .BR TIMESKEW_BACK

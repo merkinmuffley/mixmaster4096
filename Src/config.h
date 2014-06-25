@@ -365,6 +365,7 @@ extern long MAILINTIME;
 extern long KEYLIFETIME;
 extern long KEYOVERLAPPERIOD;
 extern long KEYGRACEPERIOD;
+extern int KEYLEN;
 extern int NUMCOPIES;
 extern char CHAIN[];
 extern int DISTANCE;

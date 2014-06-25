@@ -195,7 +195,7 @@ int key(BUFFER *out)
   buf_appends(out, SHORTNAME);
   buf_appends(out, "\n\n");
 
-  keymgt(0,0,4096);
+  keymgt(0,0,KEYLEN * 1024);
 
   conf_premail(out);
   buf_nl(out);

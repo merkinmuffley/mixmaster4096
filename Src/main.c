@@ -45,8 +45,7 @@ int main(int argc, char *argv[])
   int daemon = 0, type_list = 0, nodetach = 0;
   int update_stats = 0, update_pingerlist = 0;
   int never_ask_for_passphrase = 0;
-  long int lifeindays=0;
-  long int keysize=4096;
+  long int lifeindays=0, keysize=0;
 
 #ifdef USE_SOCK
   int pop3 = 0;
@@ -171,7 +170,7 @@ int main(int argc, char *argv[])
                /* only certain permitted sizes */
                break;
              default:
-               keysize=4096;
+               keysize=KEYLEN * 1024;
                break;
             }
 	} else if (strleft(p, "update-stats") && p[strlen("update-stats")] == '=') {
@@ -704,6 +703,8 @@ WinNT service:\n\
 
   if (keygen) {
     check_get_pass(0, never_ask_for_passphrase);
+    if (keysize == 0)
+      keysize = KEYLEN * 1024;
     keymgt(keygen,lifeindays,keysize);
   }
   if (sendpool)

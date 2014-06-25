@@ -154,6 +154,7 @@ long MAILINTIME;	/* frequency for processing MAILIN mail */
 long KEYLIFETIME;
 long KEYOVERLAPPERIOD;
 long KEYGRACEPERIOD;
+int KEYLEN;		/* v2 autogenerate key length (n * 1024) */
 
 char ERRLOG[LINELEN];
 char ADDRESS[LINELEN];
@@ -496,6 +497,7 @@ static void mix_setdefaults()
 	                                        	/* new ones when ./mix -K is run.*/
 	KEYGRACEPERIOD   =       7 * SECONDSPERDAY;	/* accept mail to the old key for this */
 	                                        	/* amount of time after it has expired. */
+	KEYLEN        = 1;		/* Autogenerate 1024 bit keys */
 
 
 	strnncpy(ERRLOG      , "");
@@ -582,6 +584,7 @@ int mix_configline(char *line)
 	  read_conf(PGPPUBRING) || read_conf(PGPSECRING) ||
 	  read_conf(PASSPHRASE) || read_conf_t(KEYLIFETIME) ||
 	  read_conf_t(KEYGRACEPERIOD) || read_conf_t(KEYOVERLAPPERIOD) ||
+	  read_conf_i(KEYLEN) ||
 #ifdef USE_SOCK
 	  read_conf_i(POP3DEL) || read_conf_i(POP3SIZELIMIT) ||
 	  read_conf_t(POP3TIME) ||
@@ -1025,7 +1028,7 @@ int mix_daily(void)
   pgpmaxexp();
   pool_packetexp();
   stats(NULL);
-  keymgt(0,0,4096);
+  keymgt(0,0,KEYLEN * 1024);
   return (0);
 }
 
