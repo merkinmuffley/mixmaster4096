@@ -20,7 +20,12 @@ int menu_getuserpass(BUFFER *p, int mode) { return 0; };
 #include <string.h>
 #include <assert.h>
 #include <stdlib.h>
-#include <unistd.h>
+
+#ifdef WIN32             // RTC
+#include <io.h>          // RTC
+#else                    // RTC
+#include <unistd.h>      // RTC
+#endif                   // RTC
 
 #include "menu.h"
 #ifdef WIN32
@@ -264,6 +269,11 @@ int stats_download(BUFFER *allpingers, char *sourcename, int curses) {
     mixfile(path, localfiles[i]);
     mixfile(path_t, localfiles[i]);
     strcat(path_t, ".t");
+
+#ifdef WIN32             // RTC
+    unlink(path);        // RTC
+#endif /* WIN32 */       // RTC
+    
     rename(path_t, path);
   }
   
