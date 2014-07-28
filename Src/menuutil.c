@@ -95,6 +95,9 @@ void menu_spawn_editor(char *path, int lineno) {
   sei.lpParameters = NULL;
   sei.nShow = SW_SHOWNORMAL;
 
+  sei.lpFile = "notepad.exe"; //sei.lpFile = NULL;        // RTC
+  sei.lpParameters = path;    // sei.lpParameters = path; // RTC
+
   if (ShellExecuteEx(&sei) == TRUE) {
     WaitForSingleObject(sei.hProcess, INFINITE);
     CloseHandle(sei.hProcess);

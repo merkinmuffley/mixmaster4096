@@ -658,7 +658,7 @@ int mix_config(void)
   *
   * first match wins.
   *
-  *  - what the MIXPATH environment variable points to, if it is set.
+  *  - what the MIXPATH environment variable points to, if it is set. 
   *  - On WIN32, HKEY_CURRENT_USER\Software\Mixmaster\MixDir, if it exists
   *  - whatever is compiled in with -DSPOOL
   *  - On Win32 %APPDATA%\Mixmaster
@@ -666,8 +666,13 @@ int mix_config(void)
   *  - the current working directory
   */
 
-  if (err == -1 && (d = getenv("MIXPATH")) != NULL)
-    err = mixdir(d, 1);
+#ifdef WIN32                                           // RTC
+  if (err == -1 && (d = getenv("MIX3PATH")) != NULL)   // RTC
+    err = mixdir(d, 1);                                // RTC
+#else                                                  // RTC
+  if (err == -1 && (d = getenv("MIXPATH")) != NULL)    // RTC
+    err = mixdir(d, 1);                                // RTC
+#endif /* WIN32 */                                     // RTC
 
 #ifdef WIN32
   RegOpenKeyEx(HKEY_CURRENT_USER, "Software", 0, KEY_ALL_ACCESS, &regsw);
@@ -910,8 +915,30 @@ void mix_check_timeskew() {
   }
 }
 
+#ifdef WIN32                             // RTC
+char* mix_version(void)                  // RTC
+{                                        // RTC
+  return VERSION;                        // RTC
+}                                        // RTC
+int mix_initex(char *mixdir)             // RTC
+{                                        // RTC
+  return mix_init(mixdir);               // RTC
+}                                        // RTC
+#endif /* WIN32 */                       // RTC
+
 int mix_init(char *mixdir)
 {
+#ifdef WIN32                             // RTC
+  char mixpath[PATHMAX + 9];             // RTC
+  if (mixdir)                            // RTC
+  {                                      // RTC
+     strcpy(mixpath, "MIX3PATH=");       // RTC
+     strncat(mixpath,  mixdir, PATHMAX); // RTC
+     putenv(mixpath);                    // RTC
+     initialized = 0;                    // RTC
+  }                                      // RTC
+#endif /* WIN32 */                       // RTC
+	
   if (!initialized) {
     if (mixdir)
       strncpy(MIXDIR, mixdir, LINELEN);
