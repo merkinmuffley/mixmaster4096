@@ -244,6 +244,11 @@ int mix_config(void);
 int mix_initialized(void);
 int mix_daily(void);
 
+#ifdef WIN32                  // RTC
+char* mix_version(void);      // RTC
+int mix_initex(char *mixdir); // RTC
+#endif                        // RTC
+
 /* message pool */
 #define INTERMEDIATE 0
 int pool_send(void);

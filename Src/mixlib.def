@@ -119,3 +119,13 @@ EXPORTS
     mix_check_timeskew              @114
     MIXCONF                         @115
     menu_main                       @116
+
+    ALLPINGERSFILE                  @117 ; // RTC
+    ALLPINGERSURL                   @118 ; // RTC
+    STATSSRC                        @119 ; // RTC
+    download_stats                  @120 ; // RTC
+    url_download                    @121 ; // RTC
+    parse_yearmonthday              @122 ; // RTC
+    rnd_bytes                       @123 ; // RTC
+    mix_version                     @124 ; // RTC
+    mix_initex                      @125 ; // RTC

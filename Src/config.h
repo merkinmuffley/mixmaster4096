@@ -391,8 +391,14 @@ extern int MAXRECIPIENTS;
 extern long TIMESKEW_FORWARD;
 extern long TIMESKEW_BACK;
 extern int TEMP_FAIL;
-extern char ALLPINGERSURL[];
-extern char ALLPINGERSFILE[];
+
+#ifdef WIN32                            // RTC
+DLLIMPORT extern char ALLPINGERSURL[];  // RTC
+DLLIMPORT extern char ALLPINGERSFILE[]; // RTC
+#else                                   // RTC
+extern char ALLPINGERSURL[];            // RTC
+extern char ALLPINGERSFILE[];           // RTC
+#endif /* WIN32 */                      // RTC  
 
 extern char WGET[];
 extern char STATSSRC[];

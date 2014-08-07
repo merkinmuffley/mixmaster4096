@@ -162,16 +162,16 @@ int main(int argc, char *argv[])
             if (lifeindays<0)
                 lifeindays=0;
 	} else if (strleft(p, "size") && p[strlen("size")] == '=') {
-            keysize=strtol(p + strlen("size") + 1,NULL,10);
             switch(keysize) {
              case 1024:
              case 2048:
              case 3072:
              case 4096:
                /* only certain permitted sizes */
+               keysize=strtol(p + strlen("size") + 1,NULL,10);
                break;
              default:
-               keysize=4096;
+               /* ignoring invalid size seen on comand-line */
                break;
             }
 	} else if (strleft(p, "update-stats") && p[strlen("update-stats")] == '=') {

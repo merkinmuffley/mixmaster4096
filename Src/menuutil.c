@@ -91,9 +91,10 @@ void menu_spawn_editor(char *path, int lineno) {
   sei.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_DDEWAIT;
   sei.hwnd = NULL;
   sei.lpVerb = "open";
-  sei.lpFile = path;
-  sei.lpParameters = NULL;
   sei.nShow = SW_SHOWNORMAL;
+  // next 2 settings from RTC
+  sei.lpFile = "notepad.exe";
+  sei.lpParameters = path;
 
   if (ShellExecuteEx(&sei) == TRUE) {
     WaitForSingleObject(sei.hProcess, INFINITE);

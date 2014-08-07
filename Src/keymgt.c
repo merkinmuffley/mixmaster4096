@@ -13,7 +13,12 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
-#include <unistd.h>
+
+#ifdef WIN32         // RTC
+#include <io.h>      // RTC
+#else                // RTC
+#include <unistd.h>  // RTC
+#endif               // RTC
 
 int getv2seckey(byte keyid[], BUFFER *key);
 static int getv2pubkey(byte keyid[], BUFFER *key);
@@ -510,7 +515,13 @@ int deleteoldkeys(void)
     mixfile(path2, SECRING);
     if (rename(path1, path2)) return -14;
     }
-    sync();
+
+#ifdef WIN32        // RTC
+    // sync()       // RTC
+#else               // RTC
+    sync();         // RTC
+#endif /* WIN32 */  // RTC
+
     if (!keyring) return -15;
     memset(line,'\n',LINELEN-1);
     line[LINELEN-1]='\0';
