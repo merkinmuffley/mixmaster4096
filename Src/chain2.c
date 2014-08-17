@@ -132,7 +132,7 @@ int mix2_rlist(REMAILER remailer[], int badchains[MAXREM][MAXREM])
 	  continue;
 	};
       }
-      /* Have we seen the same remailer multple times in the list? */
+      /* Have we seen the same remailer multiple times in the list? */
       nw=n; /* array index to write to */
       for (k=0;(k<n) && (nw==n);k++) {
           int eqname=0, eqaddr=0;
@@ -155,7 +155,7 @@ int mix2_rlist(REMAILER remailer[], int badchains[MAXREM][MAXREM])
               case 3:
                   /* The same remailer has appeared twice in pubring.mix which is ok but
                    * it means we must prefer one entry over another.
-                   * Either keep the exiting array entry (by "continue")
+                   * Either keep the existing array entry (by "continue")
                    * or proceed with this loop after setting nw=k (instead of n).
                    * Earlier expiry is preferred.
                    * A larger key size (2048 vs 1024) is preferred more strongly.
