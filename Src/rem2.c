@@ -341,7 +341,7 @@ int mix2_decrypt(BUFFER *m)
         /* supposed to be:
          * 3DES
          * hmac key
-         * hmac-sha256(18*512 headers)
+         * hmac-sha256(2*512 headers)
          * hmac-sha256(body)
          * hmac-sha256(328-block)
          * aes_pre_key
