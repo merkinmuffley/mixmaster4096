@@ -341,7 +341,7 @@ int mix2_decrypt(BUFFER *m)
         /* supposed to be:
          * 3DES
          * hmac key
-         * hmac-sha256(18*512 headers)
+         * hmac-sha256(2*512 headers)
          * hmac-sha256(body)
          * hmac-sha256(328-block)
          * aes_pre_key
@@ -401,6 +401,9 @@ int mix2_decrypt(BUFFER *m)
   case 1:
     buf_get(dec, mid, 16);
     buf_get(dec, iv, 8);
+    if (rsalen>=256) {
+        errlog(NOTICE, "Processing Large key exit\n");
+    }
     break;
   case 2:
     packet = buf_getc(dec);
@@ -479,8 +482,10 @@ int mix2_decrypt(BUFFER *m)
   case 1:
     buf_crypt(body, deskey, iv, DECRYPT);
     err = v2body_setlen(body);
-    if (err == -1)
+    if (err == -1) {
+      errlog(NOTICE, "Error in v2body_setlen\n");
       goto end;
+    }
     assert(body->ptr == 4);
     v2body(body);
     break;

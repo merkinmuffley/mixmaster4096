@@ -936,6 +936,7 @@ int mix_init(char *mixdir)
      strncat(mixpath,  mixdir, PATHMAX); // RTC
      putenv(mixpath);                    // RTC
      initialized = 0;                    // RTC
+     rnd_state = RND_WILLSEED;           // RTC
   }                                      // RTC
 #endif /* WIN32 */                       // RTC
 	
