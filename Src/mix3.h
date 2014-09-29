@@ -226,6 +226,7 @@ int buf_3descrypt(BUFFER *b, BUFFER *key, BUFFER *iv, int enc);
 int buf_castcrypt(BUFFER *b, BUFFER *key, BUFFER *iv, int enc);
 #ifdef USE_AES
 int buf_aescrypt(BUFFER *b, BUFFER *key, BUFFER *iv, int enc);
+int buf_aes_ctr128(BUFFER *buf, BUFFER *key, BUFFER *iv);
 #endif /* USE_AES */
 
 int db_getseckey(byte keyid[], BUFFER *key);
@@ -315,6 +316,7 @@ typedef struct {
   byte keyid[16];
   time_t expires;
   int rsalen;
+  int use_cfb;  /* CFB mode used with AES - being replaced by CTR mode */
   struct {
     unsigned int mix:1;
     unsigned int compress:1;

@@ -189,6 +189,8 @@ int mix2_rlist(REMAILER remailer[], int badchains[MAXREM][MAXREM])
       strncpy(textkeyid[nw],keyid,sizeof(textkeyid[nw]));  /* saves converting back to text to show in stderr */
       textkeyid[nw][sizeof(textkeyid[nw]) - 1] = '\0';
       id_decode(keyid, remailer[nw].keyid);
+      remailer[nw].use_cfb = 0; /* default to 0 */
+      if (!strncmp(version, "2:3.0.2", 7)) remailer[nw].use_cfb = 1;
       remailer[nw].version = N(version[0]);
       remailer[nw].flags.compress = strfind(flags, "C");
       remailer[nw].flags.post = strfind(flags, "N");
@@ -202,6 +204,7 @@ int mix2_rlist(REMAILER remailer[], int badchains[MAXREM][MAXREM])
 #ifdef SHOW_KEYID_SELECTION
       fprintf(stderr, "STORING nw=%d %s %s has rsalen=%d exp=%d\n",
       nw, remailer[nw].name, textkeyid[nw], remailer[nw].rsalen, remailer[nw].expires);
+      if (remailer[nw].use_cfb) fprintf(stderr, "  nw=%d %s uses cfb mode\n", nw, remailer[nw].name);
 #endif
       if (nw == n) n++;
     }
@@ -453,7 +456,9 @@ static int send_packet(int numcopies, BUFFER *packet, int chain[],
         } else {
             /* More data with the 3DES key inside the RSA encryption. */
 
-            /* See Tom Ritter https://crypto.is/blog/tagging_attack_on_mixmaster */
+            /* See Tom Ritter https://crypto.is/blog/tagging_attack_on_mixmaster
+               but this only defends against a tag on the next hop and not one
+               further into the chain. */
             /* This is not done for 1k RSA keys to keep compatibility with old remailers. */
 	    /*
              *  24    3deskey     (already in variable "key" then we append to it)
@@ -479,9 +484,17 @@ static int send_packet(int numcopies, BUFFER *packet, int chain[],
                fprintf(stderr, "   TTE KEY=%s\n", showdata(aes_tte_key,0));
                fprintf(stderr, "        IV=%s\n", showdata(aes_iv,0));
 */
-               buf_aescrypt(encrypted, aes_tte_key, aes_iv, ENCRYPT);
-               buf_aescrypt(body, aes_body_key, aes_iv, ENCRYPT);
-               buf_aescrypt(other, aes_header_key, aes_iv, ENCRYPT);
+             if (remailer[thischain[hop]].use_cfb) {  
+                 /* large key 3.0.2 series */
+                 buf_aescrypt(encrypted, aes_tte_key, aes_iv, ENCRYPT);
+                 buf_aescrypt(body, aes_body_key, aes_iv, ENCRYPT);
+                 buf_aescrypt(other, aes_header_key, aes_iv, ENCRYPT);
+             } else {
+                 /* large key 3.0.3 series uses CTR instead of CFB */
+                 buf_aes_ctr128(encrypted, aes_tte_key, aes_iv);
+                 buf_aes_ctr128(body, aes_body_key, aes_iv);
+                 buf_aes_ctr128(other, aes_header_key, aes_iv);
+             }
 
             /* Only 2*512 headers covered by digest so no remailer can tell where it is in the chain. */
                 if (!hop) {
@@ -529,20 +542,32 @@ static int send_packet(int numcopies, BUFFER *packet, int chain[],
 	/* now build the new header */
 	buf_clear(header);
 	buf_append(header, remailer[thischain[hop]].keyid, 16);
-        /* one byte to show RSA length */
+        /* one byte to show RSA length - rsalen_as_byte */
         switch(key->length) {
             case 128:
               /* Legacy 1024-bit RSA means 128 bytes. */
 	      buf_appendc(header, 128);
               break;
             case 256:
-	      buf_appendc(header, 2); /* 2048 */
+              if (remailer[thischain[hop]].use_cfb) {
+	          buf_appendc(header, 2); /* 2048 CFB mode */
+              } else {
+	          buf_appendc(header, 5); /* 2048 CTR mode */
+              }
               break;
             case 384:
-	      buf_appendc(header, 3); /* 3072 */
+              if (remailer[thischain[hop]].use_cfb) {
+	          buf_appendc(header, 3); /* 3072 CFB mode */
+              } else {
+	          buf_appendc(header, 6); /* 3072 CTR mode */
+              }
               break;
             case 512:
-	      buf_appendc(header, 4); /* 4096 */
+              if (remailer[thischain[hop]].use_cfb) {
+	          buf_appendc(header, 4); /* 4096 CFB mode */
+              } else {
+	          buf_appendc(header, 7); /* 4096 CTR mode */
+              }
               break;
             default:
 	      clienterr(feedback, "RSA key size not acceptable!");
