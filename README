@@ -1,5 +1,5 @@
 Mixmaster 3.0 -- anonymous remailer software -- (C) 1999 - 2000 Anonymizer Inc.
-                                  (C) 2000-2008 The Mixmaster Development Team
+                                  (C) 2000-2014 The Mixmaster Development Team
 -------------------------------------------------------------------------------
 
 This program consists of
@@ -20,8 +20,9 @@ This program consists of
   the POP3 and SMTP protocols for mail transfer.  Mixmaster includes an
   automated abuse-handling system.
 
-Please report any problems via the bug and patch trackers at
-http://sourceforge.net/projects/mixmaster/
+Please report any problems at alt.privacy.anon-server or
+https://github.com/merkinmuffley/mixmaster4096
+or remops (http://lists.mixmin.net/pipermail/remops/).
 
 
 Installation:
@@ -42,6 +43,7 @@ Libraries:
 
   The Perl Compatable Regular Expressions library can be obtained from
   ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/
+  (Red Hat related systems such as CentOS may need the "pcre-devel" package.)
 
   The zlib compression libraries can be obtained from
   http://www.gzip.org/zlib/

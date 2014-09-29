@@ -396,7 +396,8 @@ fi
 cd "$MIXSRC"
 if [ ! -f Makefile ]
 then
- LIBS=
+ # -ldl added for openssl-1.0.1i unpacked under the Src directory (on Fedora)
+ LIBS=-ldl
  INC=
  DEF=
  LDFLAGS=
