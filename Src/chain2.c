@@ -306,7 +306,7 @@ static int send_packet(int numcopies, BUFFER *packet, int chain[],
 {
   BUFFER *pid, *out, *header, *other, *encrypted, *key, *body;
   BUFFER *iv, *ivarray, *temp, *hkey, *antitag, *aes_pre_key;
-  BUFFER *pubkey, *aes_header_key, *aes_tte_key, *aes_body_key, *aes_iv;
+  BUFFER *pubkey, *aes_header_key, *aes_tte_key, *aes_body_key, *aes_iv, *aes_body_iv, *aes_header_iv;
   char addr[LINELEN];
   int thischain[20];
   int hop;
@@ -333,6 +333,8 @@ static int send_packet(int numcopies, BUFFER *packet, int chain[],
   aes_body_key=buf_new();
   aes_tte_key=buf_new();
   aes_iv=buf_new();
+  aes_body_iv=buf_new();
+  aes_header_iv=buf_new();
 
   temp->sensitive=1;
   hkey->sensitive=1;
@@ -476,7 +478,8 @@ static int send_packet(int numcopies, BUFFER *packet, int chain[],
                 buf_reset(aes_pre_key);
                 buf_setrnd(aes_pre_key, 32);
                 derive_aes_keys(aes_pre_key, hkey,
-                                aes_header_key, aes_body_key, aes_tte_key, aes_iv);
+                                aes_header_key, aes_body_key, aes_tte_key,
+				aes_iv, aes_body_iv, aes_header_iv);
 
 /*
                fprintf(stderr, "  BODY KEY=%s\n", showdata(aes_body_key,0));
@@ -485,15 +488,15 @@ static int send_packet(int numcopies, BUFFER *packet, int chain[],
                fprintf(stderr, "        IV=%s\n", showdata(aes_iv,0));
 */
              if (remailer[thischain[hop]].use_cfb) {  
-                 /* large key 3.0.2 series */
+                 /* large key 3.0.2 series uses CFB and a single IV */
                  buf_aescrypt(encrypted, aes_tte_key, aes_iv, ENCRYPT);
                  buf_aescrypt(body, aes_body_key, aes_iv, ENCRYPT);
                  buf_aescrypt(other, aes_header_key, aes_iv, ENCRYPT);
              } else {
                  /* large key 3.0.3 series uses CTR instead of CFB */
                  buf_aes_ctr128(encrypted, aes_tte_key, aes_iv);
-                 buf_aes_ctr128(body, aes_body_key, aes_iv);
-                 buf_aes_ctr128(other, aes_header_key, aes_iv);
+                 buf_aes_ctr128(body, aes_body_key, aes_body_iv);
+                 buf_aes_ctr128(other, aes_header_key, aes_header_iv);
              }
 
             /* Only 2*512 headers covered by digest so no remailer can tell where it is in the chain. */
@@ -612,6 +615,8 @@ static int send_packet(int numcopies, BUFFER *packet, int chain[],
   buf_free(aes_body_key);
   buf_free(aes_header_key);
   buf_free(aes_iv);
+  buf_free(aes_body_iv);
+  buf_free(aes_header_iv);
   buf_free(aes_pre_key);
   buf_free(aes_tte_key);
   buf_free(antitag);

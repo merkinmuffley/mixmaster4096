@@ -575,7 +575,8 @@ AES_ctr128_encrypt(buf->data, buf->data, buf->length, &ks, iv->data, &ecount, &n
 return (n);
 }
 
-int derive_aes_keys(BUFFER *aes_pre_key, BUFFER *hkey, BUFFER *aes_header_key, BUFFER *aes_body_key, BUFFER *aes_tte_key, BUFFER *aes_iv)
+int derive_aes_keys(BUFFER *aes_pre_key, BUFFER *hkey, BUFFER *aes_header_key,
+ BUFFER *aes_body_key, BUFFER *aes_tte_key, BUFFER *aes_iv, BUFFER *aes_body_iv , BUFFER *aes_header_iv)
 {
 /* Use the aes_pre_key and hkey data (known at both ends) to derive
  * 3 AES keys and an IV.
@@ -605,6 +606,18 @@ buf_sets(tempmac, "aes-iv");
 buf_cat(tempmac, aes_pre_key);
 hmac_sha256(tempmac, hkey, tempiv);
 buf_append(aes_iv, tempiv->data, 16);
+
+buf_reset(aes_body_iv);
+buf_sets(tempmac, "aes-body-iv");
+buf_cat(tempmac, aes_pre_key);
+hmac_sha256(tempmac, hkey, tempiv);
+buf_append(aes_body_iv, tempiv->data, 16);
+
+buf_reset(aes_header_iv);
+buf_sets(tempmac, "aes-header-iv");
+buf_cat(tempmac, aes_pre_key);
+hmac_sha256(tempmac, hkey, tempiv);
+buf_append(aes_header_iv, tempiv->data, 16);
 
 buf_free(tempmac);
 buf_free(tempiv);

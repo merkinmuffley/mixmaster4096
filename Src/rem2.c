@@ -245,7 +245,8 @@ int mix2_decrypt(BUFFER *m)
   BUFFER *body;
   BUFFER *header, *out;
   BUFFER *otherdigest, *bodydigest, *antitag, *extract;
-  BUFFER *ttedigest, *hkey, *aes_pre_key, *aes_header_key, *aes_body_key, *aes_tte_key, *aes_iv;
+  BUFFER *ttedigest, *hkey, *aes_pre_key, *aes_header_key, *aes_body_key, *aes_tte_key;
+  BUFFER  *aes_iv, *aes_body_iv, *aes_header_iv;
   BUFFER *trail;
 
   privkey = buf_new();
@@ -273,6 +274,8 @@ int mix2_decrypt(BUFFER *m)
   aes_body_key = buf_new();
   aes_tte_key = buf_new();
   aes_iv = buf_new();
+  aes_body_iv = buf_new();
+  aes_header_iv = buf_new();
   trail=buf_new();
 
   aes_pre_key->sensitive=1;
@@ -392,8 +395,10 @@ int mix2_decrypt(BUFFER *m)
       /* There is one more test applicable if packet type is 0. */
 
       derive_aes_keys(aes_pre_key, hkey,
-                      aes_header_key, aes_body_key, aes_tte_key, aes_iv);
+                      aes_header_key, aes_body_key, aes_tte_key,
+		      aes_iv, aes_body_iv, aes_header_iv);
      if (use_cfb) {
+         /* CFB and a single IV */
          buf_aescrypt(dec, aes_tte_key, aes_iv, DECRYPT);
      } else {
          buf_aes_ctr128(dec, aes_tte_key, aes_iv);
@@ -472,16 +477,18 @@ int mix2_decrypt(BUFFER *m)
   } else {
      /* and AES */
      if (use_cfb) {
+         /* CFB and a single IV */
          buf_aescrypt(body, aes_body_key, aes_iv, DECRYPT);
      } else {
-         buf_aes_ctr128(body, aes_body_key, aes_iv);
+         buf_aes_ctr128(body, aes_body_key, aes_body_iv);
      }
  
      buf_append(trail, m->data + 2*512, 19*512);
      if (use_cfb) {
+         /* CFB and a single IV */
          buf_aescrypt(trail, aes_header_key, aes_iv, DECRYPT);
      } else {
-         buf_aes_ctr128(trail, aes_header_key, aes_iv);
+         buf_aes_ctr128(trail, aes_header_key, aes_header_iv);
      }
   }
 
@@ -525,6 +532,8 @@ end:
   buf_free(aes_body_key);
   buf_free(aes_header_key);
   buf_free(aes_iv);
+  buf_free(aes_body_iv);
+  buf_free(aes_header_iv);
   buf_free(aes_pre_key);
   buf_free(aes_tte_key);
   buf_free(antitag);

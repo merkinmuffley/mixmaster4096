@@ -847,7 +847,7 @@ int mix_encrypt(int type, BUFFER *message, char *chain, int numcopies,
 int mix_decrypt(BUFFER *message);
 int mix_send(void);
 
-int derive_aes_keys(BUFFER *aes_pre_key, BUFFER *hkey, BUFFER *aes_header_key, BUFFER *aes_body_key, BUFFER *aes_tte_key, BUFFER *aes_iv);
+int derive_aes_keys(BUFFER *aes_pre_key, BUFFER *hkey, BUFFER *aes_header_key, BUFFER *aes_body_key, BUFFER *aes_tte_key, BUFFER *aes_iv, BUFFER *aes_body_iv, BUFFER *aes_header_iv);
 int hmac_sha256(BUFFER *b, BUFFER *hk, BUFFER *md);
 int digest_sha256(BUFFER *b, BUFFER *md);
 char *showdata(BUFFER *buf, int max);
