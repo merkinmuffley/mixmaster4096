@@ -562,7 +562,8 @@ int buf_aescrypt(BUFFER *buf, BUFFER *key, BUFFER *iv, int enc)
 int buf_aes_ctr128(BUFFER *buf, BUFFER *key, BUFFER *iv)
 {
   unsigned int n = 0;
-  unsigned char ecount[AES_BLOCK_SIZE] = "";
+  unsigned char ecount[AES_BLOCK_SIZE];
+  memset(ecount, 0, sizeof(ecount));
   AES_KEY ks;
 
   if (key == NULL || key->length == 0)
@@ -570,7 +571,7 @@ int buf_aes_ctr128(BUFFER *buf, BUFFER *key, BUFFER *iv)
 
   assert((key->length == 16 || key->length == 24 || key->length == 32) && iv->length == 16);
   AES_set_encrypt_key(key->data, key->length<<3, &ks);
-  AES_ctr128_encrypt(buf->data, buf->data, buf->length, &ks, iv->data, &ecount, &n);
+  AES_ctr128_encrypt(buf->data, buf->data, buf->length, &ks, iv->data, ecount, &n);
   return (n);
 }
 
