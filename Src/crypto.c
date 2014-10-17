@@ -564,8 +564,8 @@ int buf_aes_ctr128(BUFFER *buf, BUFFER *key, BUFFER *iv)
 {
 unsigned int n = 0;
 unsigned char ecount[AES_BLOCK_SIZE];
-memset(ecount, 0, sizeof(ecount));
 AES_KEY ks;
+memset(ecount, 0, sizeof(ecount));
 
 if (key == NULL || key->length == 0)
 return (-1);

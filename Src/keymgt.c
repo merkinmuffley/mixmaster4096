@@ -228,7 +228,7 @@ int key(BUFFER *out)
       buf_appends(out, "Use only one mixmaster key per remailer unless your client can handle multiple.\n");
       buf_appends(out, "A key length of '258' in this file means 1024-bit RSA as y=(x-2)*4.\n");
       buf_appends(out, "1024-bits offers inferior security to the larger keys that require at least version 3.0.2.\n");
-      buf_appends(out, "http://www.zen19351.zen.co.uk/mixmaster302/\n\n");
+      buf_appends(out, "http://www.zen19351.zen.co.uk/mixmaster303/\n\n");
       buf_appends(out, "=-=-=-=-=-=-=-=-=-=-=-=\n");
       buf_read(out, f);
       buf_nl(out);
