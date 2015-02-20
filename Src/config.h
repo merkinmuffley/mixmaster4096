@@ -239,7 +239,7 @@
 #define DEFAULT_NYMSECRING "nymsec.pgp"
 #define DEFAULT_NYMDB "secrets.mix"
 #define DEFAULT_STAREX "starex.txt"
-#define DEFAULT_ALLPINGERSURL "http://raw.githubusercontent.com/remops/allpingers/master/allpingers.txt"
+#define DEFAULT_ALLPINGERSURL "http://www.noreply.org/allpingers/allpingers.txt"
 #define DEFAULT_ALLPINGERSFILE "allpingers.txt"
 #define DEFAULT_WGET "wget"
 
