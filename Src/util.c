@@ -151,8 +151,10 @@ FILE *openpipe(const char *prog)
   p = _popen(prog, "w");
 #endif /* _MSC */
 
-  if (p == NULL)
-    errlog(ERRORMSG, "Unable to open pipe to %s\n", prog);
+  if (p == NULL) {
+    int errpipe = errno;
+    errlog(ERRORMSG, "Unable to open pipe to %s: %s\n", prog, strerror(errpipe));
+  }
   return p;
 }
 
