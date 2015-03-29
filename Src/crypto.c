@@ -541,6 +541,10 @@ int buf_castcrypt(BUFFER *buf, BUFFER *key, BUFFER *iv, int enc)
   return (0);
 }
 
+#ifndef USE_AES
+#error AES is compulsory in this version
+#endif
+
 #ifdef USE_AES
 int buf_aescrypt(BUFFER *buf, BUFFER *key, BUFFER *iv, int enc)
 {

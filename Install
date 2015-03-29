@@ -464,10 +464,8 @@ then
   echo
  fi
 
- opensslinfo="Please get OpenSSL 0.9.6l or greater from http://www.openssl.org/"
- opensslwarning6="WARNING: This version of OpenSSL contains known vulnerabilities. Please upgrade to OpenSSL 0.9.6l or greater!"
- opensslwarning7="WARNING: This version of OpenSSL contains known vulnerabilities. Please upgrade to OpenSSL 0.9.7c or greater!"
- opensslwarning0=$opensslwarning7
+ opensslinfo="Please get OpenSSL 1.0.2 or greater from http://www.openssl.org/"
+ opensslwarning0="WARNING: Please upgrade to OpenSSL 1.0.2 or greater!"
  LIBDIR=/usr/local/ssl/lib
  INCDIR="/usr/include /usr/include/ssl /usr/lib/ssl/include /usr/local/ssl/include"
  SRCDIR="openssl*"
@@ -547,190 +545,6 @@ then
 #
 # Here we match against known OpenSSL versions
 #
- elif [ "$version" = "90581F" ]
- then
-  decimalversion=9459743
-  echo "Compiling with OpenSSL 0.9.5a."
-  opensslwarn 6
- elif [ "$version" = "90601F" ]
- then
-  decimalversion=9461791
-  echo "Compiling with OpenSSL 0.9.6a."
-  opensslwarn 6
- elif [ "$version" = "90602F" ]
- then
-  decimalversion=9461807
-  echo "Compiling with OpenSSL 0.9.6b."
-  opensslwarn 6
- elif [ "$version" = "90603F" ]
- then
-  decimalversion=9461823
-  echo "Compiling with OpenSSL 0.9.6c."
-  opensslwarn 6
- elif [ "$version" = "90604F" ]
- then
-  decimalversion=9461839
-  echo "Compiling with OpenSSL 0.9.6d."
-  opensslwarn 6
- elif [ "$version" = "90605F" ]
- then
-  decimalversion=9461855
-  echo "Compiling with OpenSSL 0.9.6e."
-  opensslwarn 6
- elif [ "$version" = "90606F" ]
- then
-  decimalversion=9461871
-  echo "Compiling with OpenSSL 0.9.6f."
-  opensslwarn 6
- elif [ "$version" = "90607F" ]
- then
-  decimalversion=9461887
-  echo "Compiling with OpenSSL 0.9.6g."
-  opensslwarn 6
- elif [ "$version" = "90608F" ]
- then
-  decimalversion=9461903
-  echo "Compiling with OpenSSL 0.9.6h."
-  opensslwarn 6
-elif [ "$version" = "90609F" ]
- then
-  decimalversion=9461919
-  echo "Compiling with OpenSSL 0.9.6i."
-  opensslwarn 6
- elif [ "$version" = "9060A0" ]
- then
-  decimalversion=9461920
-  echo "Compiling with OpenSSL 0.9.6j."
-  opensslwarn 6
- elif [ "$version" = "9060B0" ]
- then
-  decimalversion=9461936
-  echo "Compiling with OpenSSL 0.9.6k."
-  opensslwarn 6
- elif [ "$version" = "9060C0" ]
- then
-  decimalversion=9461952
-  echo "Compiling with OpenSSL 0.9.6l."
- elif [ "$version" = "9060D0" ]
- then
-  decimalversion=9461968
-  echo "Compiling with OpenSSL 0.9.6m."
- elif [ "$version" = "90700F" ]
- then
-  decimalversion=9465871
-  echo "Compiling with OpenSSL 0.9.7."
-  opensslwarn 7
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90701F" ]
- then
-  decimalversion=9465887
-  echo "Compiling with OpenSSL 0.9.7a."
-  opensslwarn 7
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90702F" ]
- then
-  decimalversion=9465903
-  echo "Compiling with OpenSSL 0.9.7b."
-  opensslwarn 7
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90703F" ]
- then
-  decimalversion=9465919
-  echo "Compiling with OpenSSL 0.9.7c."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90704F" ]
- then
-  decimalversion=9465935
-  echo "Compiling with OpenSSL 0.9.7d."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90705F" ]
- then
-  decimalversion=9465951
-  echo "Compiling with OpenSSL 0.9.7e."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90706F" ]
- then
-  decimalversion=9465967
-  echo "Compiling with OpenSSL 0.9.7f."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90707F" ]
- then
-  decimalversion=9465983
-  echo "Compiling with OpenSSL 0.9.7g."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90708F" ]
- then
-  decimalversion=9465999
-  echo "Compiling with OpenSSL 0.9.7h."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90709F" ]
- then
-  decimalversion=9466015
-  echo "Compiling with OpenSSL 0.9.7i."
-  DEF="$DEF -DUSE_AES"
-
- elif [ "$version" = "9070AF" ]
- then
-  decimalversion=9466031
-  echo "Compiling with OpenSSL 0.9.7j."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "9070BF" ]
- then
-  decimalversion=9466047
-  echo "Compiling with OpenSSL 0.9.7k."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "9070CF" ]
- then
-  decimalversion=9466063
-  echo "Compiling with OpenSSL 0.9.7l."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "9070DF" ]
- then
-  decimalversion=9466079
-  echo "Compiling with OpenSSL 0.9.7m."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "9070EF" ]
- then
-  decimalversion=9466095
-  echo "Compiling with OpenSSL 0.9.7n."
-  echo "This version was unreleased at the time of packaging."
-  echo "It is not guaranteed to work. Please report any problems."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90800F" ]
- then
-  decimalversion=9469967
-  echo "Compiling with OpenSSL 0.9.8."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90801F" ]
- then
-  decimalversion=9469983
-  echo "Compiling with OpenSSL 0.9.8a."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90802F" ]
- then
-  decimalversion=9469999
-  echo "Compiling with OpenSSL 0.9.8b."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90803F" ]
- then
-  decimalversion=9470015
-  echo "Compiling with OpenSSL 0.9.8c."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90804F" ]
- then
-  decimalversion=9470031
-  echo "Compiling with OpenSSL 0.9.8d."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90805F" ]
- then
-  decimalversion=9470047
-  echo "Compiling with OpenSSL 0.9.8e."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90806F" ]
- then
-  decimalversion=9470063
-  echo "Compiling with OpenSSL 0.9.8f."
-  DEF="$DEF -DUSE_AES"
  elif [ "$version" = "90807F" ]
  then
   decimalversion=9470079
@@ -747,6 +561,11 @@ elif [ "$version" = "90609F" ]
   echo "Compiling with OpenSSL 0.9.8h."
   echo "This version was unreleased at the time of packaging."
   echo "It is not guaranteed to work. Please report any problems."
+  DEF="$DEF -DUSE_AES"
+ elif [ "$version" = "1000200F" ]
+ then
+  decimalversion=268443663
+  echo "Compiling with OpenSSL 1.0.2F."
   DEF="$DEF -DUSE_AES"
  fi
 #
@@ -772,6 +591,10 @@ elif [ "$version" = "90609F" ]
     DEF="$DEF -DUSE_AES"
     fi
   fi
+ elif [ "$decimalversion" -ge "268443663" ]  # 1.0.2F
+ then
+     echo This OpenSSL version looks good at February 2015.
+     sleep 1
  elif [ "$decimalversion" -lt "2336" ]  # 920
  then
   echo "This version: ${version} of SSLeay is not supported."
