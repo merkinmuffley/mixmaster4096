@@ -215,6 +215,7 @@
 #define DEFAULT_DHPARAMS "dhparam.mix"
 #define DEFAULT_MIXRAND "mixrand.bin"
 #define DEFAULT_SECRING "secring.mix"
+#define DEFAULT_SECRINGNEW "secring.mix.new"
 #define DEFAULT_PUBRING "pubring.mix"
 #define DEFAULT_IDLOG "id.log"
 #define DEFAULT_STATS "stats.log"
@@ -262,6 +263,7 @@ extern char DSAPARAMS[];
 extern char DHPARAMS[];
 extern char MIXRAND[];
 extern char SECRING[];
+extern char SECRINGNEW[];
 extern char PUBRING[];
 extern char IDLOG[];
 extern char STATS[];
