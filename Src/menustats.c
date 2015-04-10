@@ -41,10 +41,21 @@ int url_download(char *url, char *dest) {
 #ifdef WIN32
   err = URLDownloadToFile(NULL, url, dest, BINDF_GETNEWESTVERSION, NULL);
 
-  if (err != S_OK)
-    return -1;
-  else
+  if (err == S_OK) {
     return 0;
+  } else if (err == E_OUTOFMEMORY) {
+    errlog(ERRORMSG, "Insufficient memory downloading URL: %s", url);
+    return -1;
+  } else if (err == INET_E_DOWNLOAD_FAILURE) {
+    errlog(ERRORMSG, "Invalid URL: %s", url);
+    return -1;
+  } else if (err == INET_E_OBJECT_NOT_FOUND) {
+    errlog(ERRORMSG, "URL object not found: %s", url);
+    return -1;
+  } else {
+    errlog(ERRORMSG, "%s: URL download error: %d\n", url, err);
+    return -1;
+  }
 #else
   int i;
   {
