@@ -239,7 +239,8 @@ int stats(BUFFER *b)
       buf_nl(b);
     }
   }
-  if (b && (rs=mix_openfile(RSATEXTFILE, "r")) != NULL) {
+  if (b) {
+    if ((rs=mix_openfile(RSATEXTFILE, "r")) != NULL) {
       buf_nl(b);
       buf_appends(b, "Mix key sizes used (1024, 2048, 3072 and 4096 bit RSA)\n");
       while ( fgets(line, sizeof(line), rs) ) {
@@ -248,6 +249,8 @@ int stats(BUFFER *b)
           if (line[strlen(line)-1] != '\n') buf_nl(b);
       }
       buf_nl(b);
+      fclose(rs);
+    }
   }
   return (0);
 }
