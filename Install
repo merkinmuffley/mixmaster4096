@@ -77,12 +77,18 @@ findlib()
  LDFLAG=
  MAKELIB=
 
- for i in /usr/local/lib /usr/lib /lib /usr/lib64 /usr/lib/i386-linux-gnu /usr/lib/x86_64-linux-gnu/ /opt/crypto/lib
+ for i in /usr/local/lib /usr/lib /lib /usr/lib64 /usr/lib/i386-linux-gnu /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /opt/crypto/lib
  do
-  if [ -r $i/$lib -o -r $i/$libso ]
+  echo :::
+  ls -lad $i/$lib 2>/dev/null
+  ls -lad $i/$libso 2>/dev/null
+  ls -lad $i/$libso.?  2>/dev/null
+  ls -lad $i/$libso.?.?.?  2>/dev/null
+  if [ -r $i/$lib -o -r $i/$libso -o -r $i/$libso.? -o -r $i/$libso.?.?.? ]
   then
    found=$i
    type=system
+   break
   fi
  done
 
@@ -104,7 +110,7 @@ findlib()
   fi
  done
 
- if [ -r "$found/$libso" ]
+ if [ -r $found/$libso ]
  then
   echo "Found at $found/$libso."
  elif [ -r "$found/$lib" ]
@@ -143,14 +149,19 @@ findlib()
  if [ "$found" = "" ]
  then
   echo "Not found."
+ else
+     if [ -r $found/lib/$lib ]
+     then
+      LIB=$found/lib/$lib
+     elsif [ -r $found/$lib ]
+      LIB=$found/$lib
+     elsif [ -r $found/$lib.? ]
+      LIB=$found/$lib.?
+     elsif [ -r $found/$lib.?.?.? ]
+      LIB=$found/$lib.?.?.?
+     fi
  fi
 
- if [ -r $found/lib/$lib ]
- then
-  LIB=$found/lib/$lib
- else
-  LIB=$found/$lib
- fi
  if [ "$type" = system ]
  then
   LIB=
@@ -545,28 +556,15 @@ then
 #
 # Here we match against known OpenSSL versions
 #
- elif [ "$version" = "90807F" ]
- then
-  decimalversion=9470079
-  echo "Compiling with OpenSSL 0.9.8g."
-  DEF="$DEF -DUSE_AES"
- elif [ "$version" = "90808F" ]
- then
-  decimalversion=9470095
-  echo "Compiling with OpenSSL 0.9.8h."
-  DEF="$DEF -DUSE_AES"
  elif [ "$version" = "90809F" ]
  then
   decimalversion=9470111
   echo "Compiling with OpenSSL 0.9.8h."
-  echo "This version was unreleased at the time of packaging."
-  echo "It is not guaranteed to work. Please report any problems."
-  DEF="$DEF -DUSE_AES"
+  echo "This version is old - please update".
  elif [ "$version" = "1000200F" ]
  then
   decimalversion=268443663
   echo "Compiling with OpenSSL 1.0.2F."
-  DEF="$DEF -DUSE_AES"
  fi
 #
 # Now we try to guess about unknown versions: 
@@ -583,13 +581,6 @@ then
   then
    echo $opensslinfo
    exit 1
-  else
-   echo "Does this version of OpenSSL contain AES support?"
-   readln "If unsure of the answer, say \`n'" n
-    if [ "$ans" = "y" ]
-    then
-    DEF="$DEF -DUSE_AES"
-    fi
   fi
  elif [ "$decimalversion" -ge "268443663" ]  # 1.0.2F
  then
@@ -613,16 +604,10 @@ then
   then
    echo $opensslinfo
    exit 1
-  else 
-   echo "Does this version of OpenSSL contain AES support?"
-   readln "If unsure of the answer, say \`n'" n
-    if [ "$ans" = "y" ]
-    then
-    DEF="$DEF -DUSE_AES"
-    fi
   fi
  fi
 
+ DEF="$DEF -DUSE_AES"
  LIBDIR=
  INCDIR=/usr/include/ncurses
  SRCDIR=ncurses*
