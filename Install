@@ -79,11 +79,6 @@ findlib()
 
  for i in /usr/local/lib /usr/lib /lib /usr/lib64 /usr/lib/i386-linux-gnu /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /opt/crypto/lib
  do
-  echo :::
-  ls -lad $i/$lib 2>/dev/null
-  ls -lad $i/$libso 2>/dev/null
-  ls -lad $i/$libso.?  2>/dev/null
-  ls -lad $i/$libso.?.?.?  2>/dev/null
   if [ -r $i/$lib -o -r $i/$libso -o -r $i/$libso.? -o -r $i/$libso.?.?.? ]
   then
    found=$i
