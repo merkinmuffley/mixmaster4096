@@ -13,7 +13,6 @@
 #include <string.h>
 #include <time.h>
 #include <assert.h>
-#include <errno.h>
 
 #ifdef WIN32         // RTC
 #include <io.h>      // RTC
@@ -453,16 +452,12 @@ int deleteoldkeys(void)
   BUFFER *header;
   char *res=line;
 
-    if ((keyring = mix_openfile(SECRING, "r")) == NULL) {
-        errlog(ERRORMSG, "Unable to read secret keyring: %s\n", SECRING);
+    keyring = mix_openfile(SECRING, "r");
+    if (!keyring)
         return -1;
-    }
-    if ((newsecring = mix_openfile(SECRINGNEW, "w")) == NULL) {
-        errlog(ERRORMSG, "Unable to write new secring: %s\n", SECRINGNEW);
-	// If we get here, keyring must be open, so close it.
-	fclose(keyring);
+    newsecring = mix_openfile("secring.mix.new", "w");
+    if (!newsecring)
         return -1;
-    }
 
     while (res) {
         linecount++;
@@ -514,13 +509,11 @@ int deleteoldkeys(void)
     /* replace the file and wipe the old one */
     keyring = mix_openfile(SECRING, "r+");
     {
-    // rename the temp SECRINGNEW to the live SECRING
-    errlog(LOG, "Renaming %s to %s.\n", SECRINGNEW, SECRING);
-    if (rename(SECRINGNEW, SECRING)) {
-	int err_rename = errno;
-	errlog(ERRORMSG, "Rename failed with errno: %d.\n", err_rename);
-	return -14;
-    }
+    /* rename the "secring.mix.new" in the MIXDIR not CWD */
+    char path1[PATHMAX], path2[PATHMAX];
+    mixfile(path1, "secring.mix.new");
+    mixfile(path2, SECRING);
+    if (rename(path1, path2)) return -14;
     }
 
 #ifdef WIN32        // RTC
