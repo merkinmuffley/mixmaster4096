@@ -509,6 +509,11 @@ int msg_send(char *name)
       err = filtermsg(m);
       if (err == 1)
 	userfrom = 1, err = 0;
+      if (err == 2) {
+        errlog(LOG, "All recipients filtered out. Rejecting message\n");
+        err = -1;
+        goto end;
+      }
       if (err != -1) {
 	/* message has recipients */
 	errlog(DEBUGINFO, "Sending message (%ld bytes)\n", m->length);
@@ -804,8 +809,9 @@ int filtermsg(BUFFER *in)
 
   /* return 1 for user supplied From line */
   err = from;
+  // Return 2 if no valid recipients in the message
   if (dest == 0)
-    err = -1;
+    err = 2;
 
 end:
   buf_move(in, out);
