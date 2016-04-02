@@ -1,0 +1,18 @@
+xen virtualisation notes for debian
+
+Important lines in a xen definition file such as xen_deb83_build:
+- Use hardware virtualisation to get a virtual bios from which you can boot a virtual cdrom.
+- Use hda (not xvda) for your disk type for driver support in debian.
+
+builder = "hvm"
+disk = [ '/virt/extloop/mixdeb83_build.img,raw,hda,rw', 
+         '/virt/install_images/debian8.3/debian-8.3.0-amd64-CD-1.iso,raw,hdc:cdrom,r', ]
+
+20GB is plenty for a build server, and 10GB for a test server.
+Keep a backup so you can easily reinstall the application
+on a fresh OS install without needing to perform the OS install again.
+
+-rw-r--r--  root 21474836480 ... /virt/extloop/mixdeb83_build.img
+-rw-r--r--  root 10737418240 ... /virt/extloop/mixdeb83_test.img
+-rw-r--r--  root   456279772 ... /virt/extloop/mixdeb83_test.img.BASECOPY.xz
+-rw-r--r--  root   657457152 ... /virt/install_images/debian8.3/debian-8.3.0-amd64-CD-1.iso
