@@ -510,9 +510,9 @@ int msg_send(char *name)
       if (err == 1)
 	userfrom = 1, err = 0;
       if (err == 2) {
-	errlog(LOG, "All recipients filtered out. Rejecting message\n");
-	err = -1;
-	goto end;
+        errlog(LOG, "All recipients filtered out. Rejecting message\n");
+        err = -1;
+        goto end;
       }
       if (err != -1) {
 	/* message has recipients */

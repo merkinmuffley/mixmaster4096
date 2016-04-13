@@ -577,10 +577,10 @@ then
    echo $opensslinfo
    exit 1
   fi
- elif [ "$decimalversion" -ge "268443663" ]  # 1.0.2F
+ elif [ "$decimalversion" -ge "268443727" ]  # 1.0.2d 9 Jul 2015
  then
-     echo This OpenSSL version looks good at February 2015.
-     sleep 1
+     echo This OpenSSL version looks good at August 2015.
+     sleep 5
  elif [ "$decimalversion" -lt "2336" ]  # 920
  then
   echo "This version: ${version} of SSLeay is not supported."
@@ -660,19 +660,9 @@ then
  ideawarn()
  {
     echo "
-  WARNING: Your version of OpenSSL has been configured without IDEA support.
-  If you continue, Mixmaster will be installed with reduced functionality.
-  This means (among other things) that Mixmaster will not create an RSA
-  OpenPGP key (to avoid mail loss in the Type I system). You may want to
-  re-install OpenSSL before proceeding.
-
-  This will not concern you if you only plan to run a type II remailer or
-  simply want a type II client."
-    readln "Continue anyway?" y
-    if [ "$ans" = "n" ]
-    then
-     exit 1
-    fi
+  NOTICE: Your version of OpenSSL has been configured without IDEA support.  That is OK.
+  "
+  sleep 5
  }
 
  if [ "$system" = OpenBSD ]

@@ -1,0 +1,20 @@
+seen on alt.privacy.anon-server, March 2016, not tested by me yet
+
+Under systemd, it's very easy to create proper startup scripts.
+
+This needs to be copied into /etc/systemd/system/mixmaster.service.
+
+
+Description=Mixmaster Anonymous Remailer
+After=mail-transport-agent.target
+
+Type=simple
+User=mix
+Group=mix
+ExecStart=/home/mix/Mix/mixmaster -D
+KillMode=process
+
+WantedBy=multi-user.target
+
+
+# systemctl enable mixmaster
