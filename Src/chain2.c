@@ -57,7 +57,7 @@ int prepare_type2list(BUFFER *out)
 	};
 	if (expires < time(NULL)) {
 	  errlog(WARNING, "Key %s has expired.\n", keyid);
-	  continue;
+	  //continue;
 	};
       }
       buf_appends(out, line);
@@ -129,7 +129,7 @@ int mix2_rlist(REMAILER remailer[], int badchains[MAXREM][MAXREM])
 	};
 	if (expires < time(NULL)) {
 	  errlog(WARNING, "Key %s has expired.\n", keyid);
-	  continue;
+	  //continue;
 	};
       }
       /* Have we seen the same remailer multiple times in the list? */
