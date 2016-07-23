@@ -22,7 +22,11 @@
 /@nym\.mixmin\.net$/
 /@mixnym\.net$/
 /@is-not-my\.name$/
-/@dizum\.nl$/
+/@mixnym\.net$/
+/@nymph\.paranoici\.org$/
+/@nymphet\.paranoici\.org$/
+/@nym\.now\.im$/
+
 
 ##
 ## Some (not all) pingers
@@ -30,4 +34,3 @@
 /^echolot(?:1024)?[+@]/
 /^pinger[+@]/
 /^estragon(?:\+[^@]+)?@frell\.theremailer\.net$/
-/^fourohninesix[+@]/
