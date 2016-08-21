@@ -1,0 +1,24 @@
+HTTPS can be used to protect the remailer web
+traffic that obtains pubkeys and stats.
+
+Certificates for https are signed statements about a key;
+such as what domain name it is for.   Make sure the right
+CommonName has been used and the cert has not expired.
+
+Good protocol options and good ciphersuites should
+be present.  The older bad ones should be avoided
+as their presence is often harmful even if you don't
+think anyone will use them.  Current software versions
+are also important and usually fix bugs.
+
+A browser can show you certificate details of the site
+your are viewing (like the png file here where the green
+padlock at top-left was clicked on to get the https
+connection details).
+
+Qualys have a free service that will assess a site and
+report on problems with the certificate/chain and
+protocol versions etc.
+
+https://www.ssllabs.com/ssltest/ 
+https://www.ssllabs.com/projects/documentation/

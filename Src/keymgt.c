@@ -222,8 +222,7 @@ int key(BUFFER *out)
   }
 #endif /* USE_PGP */
   if (MIX) {
-    if (((f = mix_openfile("all_my_pubkeys.txt", "r")) != NULL) ||
-        ((f = mix_openfile(KEYFILE, "r")) != NULL)) {
+    if ((f = mix_openfile(KEYFILE, "r")) != NULL) {
       buf_appends(out, "Here is the Mixmaster key:\n");
       buf_appends(out, "Use only one mixmaster key per remailer unless your client can handle multiple.\n");
       buf_appends(out, "A key length of '258' in this file means 1024-bit RSA as y=(x-2)*4.\n");

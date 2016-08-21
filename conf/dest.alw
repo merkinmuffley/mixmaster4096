@@ -22,13 +22,14 @@
 /@nym\.mixmin\.net$/
 /@mixnym\.net$/
 /@is-not-my\.name$/
-/@dizum\.nl$/
+/@nymph\.paranoici\.org$/
+/@nymphet\.paranoici\.org$/
+/@nym\.now\.im$/
+
 
 ##
 ## Some (not all) pingers
 ##
-/^echolot\+/
-/^pinger\+/
-/^estragon\+.+@frell\.theremailer\.net$/
-/^echolot4\+/
-/^fourohninesix\+/
+/^echolot(?:1024)?[+@]/
+/^pinger[+@]/
+/^estragon(?:\+[^@]+)?@frell\.theremailer\.net$/
