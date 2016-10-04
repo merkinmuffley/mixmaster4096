@@ -1,0 +1,7 @@
+mixmaster_3.1.orig.tar.gz
+mixmaster_3.1
+
+https://wiki.debian.org/Packaging/Intro?action=show&redirect=IntroDebianPackaging
+
+debuild -us -uc 
+

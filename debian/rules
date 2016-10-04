@@ -1,0 +1,23 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+
+build:
+	echo BUILD
+	$(MAKE)
+
+clean:
+	echo CLEAN
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+	$(MAKE) clean
+	dh_clean
+
+install:
+	echo INSTALL
+	dh_testdir
+	dh_testroot
+	dh_clean
+	dh_installdirs

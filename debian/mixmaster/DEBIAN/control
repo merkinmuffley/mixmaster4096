@@ -1,0 +1,10 @@
+Package: mixmaster
+Version: 3.1-1
+Architecture: amd64
+Maintainer: Merkin Muffley <merkinmuffley@github.com>
+Installed-Size: 39
+Section: misc
+Priority: optional
+Homepage: https://github.com/merkinmuffley/mixmaster4096
+Description: anonymous mail
+ both client and server

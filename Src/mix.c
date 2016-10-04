@@ -398,7 +398,6 @@ static void mix_setdefaults()
 	strnncpy(DHPARAMS     , DEFAULT_DHPARAMS);
 	strnncpy(MIXRAND      , DEFAULT_MIXRAND);
 	strnncpy(SECRING      , DEFAULT_SECRING);
-	strnncpy(SECRINGNEW   , DEFAULT_SECRINGNEW);
 	strnncpy(PUBRING      , DEFAULT_PUBRING);
 	strnncpy(IDLOG        , DEFAULT_IDLOG);
 	strnncpy(STATS        , DEFAULT_STATS);
@@ -603,7 +602,6 @@ int mix_configline(char *line)
 	  read_conf(KEYFILE) || read_conf(PGPKEY) ||
 	  read_conf(DSAPARAMS) || read_conf(DHPARAMS) ||
 	  read_conf(MIXRAND) || read_conf(SECRING) ||
-	  read_conf(SECRINGNEW) ||
 	  read_conf(PUBRING) || read_conf(IDLOG) ||
 	  read_conf(STATS) || read_conf(DESTBLOCK) ||
 	  read_conf(PGPMAXCOUNT) ||
@@ -743,6 +741,9 @@ int mix_config(void)
     fclose(f);
   }
 
+  /* set SECRINGNEW after reading SECRING from cfg file */
+  strncpy(SECRINGNEW, SECRING, PATHMAX);
+  strncat(SECRINGNEW, ".new", PATHMAX); SECRINGNEW[PATHMAX-1]='\0';
   mixfile(POOLDIR, POOL); /* set POOLDIR after reading POOL from cfg file */
   if (POOLDIR[strlen(POOLDIR) - 1] == DIRSEP)
     POOLDIR[strlen(POOLDIR) - 1] = '\0';

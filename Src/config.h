@@ -215,7 +215,6 @@
 #define DEFAULT_DHPARAMS "dhparam.mix"
 #define DEFAULT_MIXRAND "mixrand.bin"
 #define DEFAULT_SECRING "secring.mix"
-#define DEFAULT_SECRINGNEW "secring.mix.new"
 #define DEFAULT_PUBRING "pubring.mix"
 #define DEFAULT_IDLOG "id.log"
 #define DEFAULT_STATS "stats.log"

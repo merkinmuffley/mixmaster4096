@@ -1,0 +1,13 @@
+Source: mixmaster
+Maintainer: Merkin Muffley <merkinmuffley@github.com>
+Homepage: https://github.com/merkinmuffley/mixmaster4096
+Section: misc
+Priority: optional
+Standards-Version: 3.9.6
+Build-Depends: debhelper (>= 9), gcc (>= 4.9.2), openssl (>= 1.0.1)
+
+Package: mixmaster
+Architecture: amd64
+Depends: ${misc:Depends}
+Description: anonymous mail
+ both client and server
