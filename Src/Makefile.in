@@ -82,5 +82,8 @@ parsedate.tab.c: parsedate.y
 parsedate: parsedate.tab.c
 	gcc -DTEST parsedate.tab.c -o parsedate
 
+install: debian/usr/bin/mixmaster
+	echo TRYING INSTALL debian/usr/bin/mixmaster to /usr/bin/mixmaster
+	install debian/usr/bin/mixmaster /usr/bin/
 
 include Makefile.deps

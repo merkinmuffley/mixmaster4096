@@ -1,0 +1,797 @@
+#!/bin/sh
+# Mixmaster version 3.1  --  (C) 1999-2008 Anonymizer Inc. and others.
+
+# Mixmaster may be redistributed and modified under certain conditions.
+# This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
+# ANY KIND, either express or implied. See the file COPYRIGHT for
+# details.
+
+# $Id$
+
+#whereis program default-path
+whereis()
+{
+  #echo "Looking for $1..."
+  found=""
+  for i in $* `which $1 2>&1`
+  do
+    if [ -f "$i" -a -x "$i" ]
+    then
+      found=$i
+    fi
+  done
+  if [ "$found" = "" ]
+  then
+    found=$2
+#    echo "$1 not found. Using $found."
+#  else
+#    echo "$1 is at $found."
+  fi
+}
+
+if echo -n | grep n >/dev/null
+then
+ echo1=""
+ echo2="\c"
+else
+ echo1="-n"
+ echo2=""
+fi
+
+# readln text default
+readln()
+{
+  echo $echo1 "$1 [$2] $echo2"
+  read ans
+  if [ -z "$ans" ]
+  then
+    ans="$2"
+  fi
+}
+
+# findlib libxxx.a -- find and configure libraries
+#    Input:
+#       $1       library name
+#       $CONFIG  library configure options
+#       $INCDIR  possible include directories
+#       $SRCDIR  possible library source directories
+#       $LIBDIR  possible library binary directories
+#
+#    Output:
+#       $found   library directory
+#       $lib     library name
+#       $INCDIR  include directory if required, empty otherwise
+#       $LDFLAG  linker options
+#       $LIB     path to library file
+#       $MAKELIB Makefile entry to compile library
+findlib()
+{
+ lib=$1
+ libso=`echo $lib | sed 's/\.a$/.so/'`
+ echo "Looking for $lib..."
+
+ found=
+ source=
+ type=
+ LIB=
+ LDFLAG=
+ MAKELIB=
+
+ for i in /usr/local/lib /usr/lib /lib /usr/lib64 /usr/lib/i386-linux-gnu /lib/x86_64-linux-gnu /usr/lib/x86_64-linux-gnu /opt/crypto/lib
+ do
+  if [ -r $i/$lib -o -r $i/$libso -o -r $i/$libso.? -o -r $i/$libso.?.?.? ]
+  then
+   found=$i
+   type=system
+   break
+  fi
+ done
+
+ for i in $LIBDIR
+ do
+  if [ -r $i/$lib -o -r $i/$libso ]
+  then
+   found=$i
+   type=installed
+  fi
+ done
+
+ for i in $SRCDIR
+ do
+  if [ -r $i/$lib -o -r $i/lib/$lib ]
+  then
+   found=$i
+   type=binary
+  fi
+ done
+
+ if [ -r $found/$libso ]
+ then
+  echo "Found at $found/$libso."
+ elif [ -r "$found/$lib" ]
+ then
+  echo "Found at $found/$lib."
+ elif [ -r "$found/lib/$lib" ]
+ then
+  echo "Found at $found/lib/$lib."
+ fi
+
+ for i in $SRCDIR
+ do
+  if [ -d $i -a ! "$type" = binary ]
+  then
+   source=$i
+  fi
+ done
+
+ if [ "$source" != "" ]
+ then
+  echo "Found source directory $source."
+  if [ "$found" = "" ]
+  then
+   ans=y
+  else
+   echo "Use the source if the pre-installed library causes compilation problems."
+   readln "Use source?" n
+  fi
+  if [ "$ans" = "y" ]
+  then
+   found=$source
+   type=source
+  fi
+ fi
+
+ if [ "$found" = "" ]
+ then
+  echo "Not found."
+ else
+     if [ -r $found/lib/$lib ]
+     then
+      LIB=$found/lib/$lib
+     elsif [ -r $found/$lib ]
+      LIB=$found/$lib
+     elsif [ -r $found/$lib.? ]
+      LIB=$found/$lib.?
+     elsif [ -r $found/$lib.?.?.? ]
+      LIB=$found/$lib.?.?.?
+     fi
+ fi
+
+ if [ "$type" = system ]
+ then
+  LIB=
+  LDFLAG="-l`echo $lib | sed 's/^lib//;s/\.a$//'` -L$found"
+  if [ "$found" = "/usr/local/lib" ]
+  then
+    INCDIR="/usr/local/include /opt/crypto/include $INCDIR"
+  fi
+ fi
+
+ incdir=$INCDIR
+ INCDIR=
+ for i in $incdir
+ do
+  if [ -d $i ]
+  then
+   INCDIR=$i
+  fi
+ done
+
+ if [ "$type" = source -o "$type" = binary ]
+ then
+  if [ ! -r $found/lib/$lib ]
+  then
+   MAKELIB="$found/$lib:
+	cd $found; make $lib"
+  fi
+  if [ -d $found/include ]
+  then
+   INCDIR=$found/include
+  else
+   INCDIR=$found
+  fi
+ fi
+
+ if [ "$type" = source ]
+ then
+  dir=`pwd`
+  if [ "$dir" = "" ]
+  then
+   dir=$PWD
+  fi
+
+  cd $found
+  if [ -x configure ]
+  then
+   echo "Configuring..."
+   ./configure $CONFIG
+  fi
+  if [ "$lib" = "libcrypto.a" ]
+  then
+   if [ -f config ]
+   then
+    sh config
+   elif [ -x Configure ]
+   then
+    ./Configure 2>tmp.$$
+    cat tmp.$$
+    readln "Your system?" `cat tmp.$$ | tr ' ' '\n' | grep -i \`uname\` | tail -1`
+    rm -f tmp.$$
+    echo "Configuring..."
+    ./Configure $ans
+   fi
+  fi
+  cd $dir
+ fi
+}
+
+# Global installation.
+##########################################################################
+umask 077
+
+MIXDIR="$PWD"
+if [ "$MIXDIR" = "" ]
+then
+ MIXDIR=`pwd`
+fi
+MIXCFG="$MIXDIR/conf"
+MIXSRC="$MIXDIR/Src"
+MIXDATA=/var/mixmaster
+MIXDATADEB=`pwd`/debian$MIXDATA
+MIXKEYDIR=/var/mixkeys
+MIXKEYDIRDEB=`pwd`/debian$MIXKEYDIR
+
+system=`uname`
+
+HOSTNAME=build.example.org
+
+if [ -f "$MIXSRC/Makefile" ]
+then
+ if grep "#Makefile generated.*$HOSTNAME" $MIXSRC/Makefile
+ then
+  echo "Found a Makefile for this system."
+  readln "Use this Makefile?" y
+  if [ "$ans" = n ]
+  then
+   rm -f "$MIXSRC/Makefile"
+  fi
+ else
+  readln "Remove old Makefile?" y
+  if [ "$ans" = y ]
+  then
+   rm -f "$MIXSRC/Makefile"
+  fi
+ fi
+fi
+
+ MIXDEST=/usr/bin  #  eventual program location
+ MIXDESTDEB=`pwd`/debian$MIXDEST # temp while making package
+
+if [ ! -d "$MIXDESTDEB" ]
+then
+  echo "Creating directory $MIXDESTDEB"
+  mkdir -p "$MIXDESTDEB"
+fi
+if [ ! -d "$MIXDESTDEB" ]
+then
+  echo "Cannot not create $MIXDESTDEB"
+  exit 1
+fi
+if [ ! -d "$MIXDATADEB" ]
+then
+  echo "Creating directory $MIXDATADEB"
+  mkdir -p "$MIXDATADEB"
+fi
+if [ ! -d "$MIXDATADEB" ]
+then
+  echo "Cannot not create $MIXDATADEB"
+  exit 1
+fi
+if [ ! -d "$MIXKEYDIRDEB" ]
+then
+  echo "Creating directory $MIXKEYDIRDEB"
+  mkdir -p "$MIXKEYDIRDEB"
+fi
+if [ ! -d "$MIXKEYDIRDEB" ]
+then
+  echo "Cannot not create $MIXKEYDIRDEB"
+  exit 1
+fi
+
+rm -f "$MIXSRC/mix.o" # make sure our new passphrase takes effect
+
+cd "$MIXSRC"
+if [ ! -f Makefile ]
+then
+ # -ldl added for openssl-1.0.1i unpacked under the Src directory (on Fedora)
+ LIBS=-ldl
+ INC=
+ DEF=
+ LDFLAGS=
+
+ if [ "$system" = SunOS ]
+ then
+  LDFLAGS="-lsocket -lnsl"
+ fi
+
+ LIBDIR=
+ INCDIR=
+ SRCDIR=zlib*
+ findlib libz.a
+ if [ "$found" = "" ]
+ then
+   echo "Please install zlib 1.2.8 or greater now."
+   exit 1
+ else
+  ZLIB="$MAKELIB"
+  DEF="$DEF -DUSE_ZLIB"
+  LIBS="$LIBS $LIB"
+  LDFLAGS="$LDFLAGS $LDFLAG"
+  if [ "$INCDIR" != "" ]
+  then
+   INC="$INC -I$INCDIR"
+  fi
+ fi
+
+ LIBDIR=
+ INCDIR="/usr/include /usr/include/pcre /usr/local/pcre/include"
+ SRCDIR=pcre*
+ findlib libpcre.a
+ if [ "$found" != "" ]
+ then
+  PCRE="$MAKELIB"
+  DEF="$DEF -DUSE_PCRE"
+  LIBS="$LIBS $LIB"
+  LDFLAGS="$LDFLAGS $LDFLAG"
+  if [ "$INCDIR" != "" ]
+  then
+   INC="$INC -I$INCDIR"
+  fi
+ else
+  echo
+  echo If you have library file not called libpcre.so you might get one with the command  ln -s libpcre.so.1 libpcre.so
+  echo
+ fi
+
+ opensslinfo="Please get OpenSSL 1.0.2 or greater from http://www.openssl.org/"
+ opensslwarning0="WARNING: Please upgrade to OpenSSL 1.0.2 or greater!"
+ LIBDIR=/usr/local/ssl/lib
+ INCDIR="/usr/include /usr/include/ssl /usr/lib/ssl/include /usr/local/ssl/include"
+ SRCDIR="openssl*"
+
+ opensslwarn()
+ {
+ if [ "$1" = "6" ]
+ then
+  echo $opensslwarning6
+ elif [ "$1" = "7" ]
+ then
+  echo $opensslwarning7
+ else 
+  echo $opensslwarning0
+ fi
+  readln "Continue anyway?" y
+  if [ "$ans" = "n" ]
+  then
+   echo $opensslinfo
+   exit 1
+  fi
+ }
+
+ INCDIR="/usr/include /usr/local/include /opt/crypto/include"
+ if [ "$system" = win32 ]
+ then
+  findlib libeay32.a
+ else
+  findlib libcrypto.a
+ fi
+ if [ "$found" = "" ]
+ then
+  echo $opensslinfo
+  exit 1
+ fi
+
+ OPENSSLLIB="$LIB"
+ LIBS="$LIBS $LIB"
+ LDFLAGS="$LDFLAGS $LDFLAG"
+ if [ "$MAKELIB" != "" ]
+ then
+  OPENSSL="$found/$lib:
+	cd $found/crypto; make"
+ fi
+ if [ -d "$INCDIR/openssl" ]
+ then
+  INC="$INC -I$INCDIR"
+ else
+  # detect old SSLeay versions
+  if [ -f "$INCDIR/crypto.h" ]
+  then
+   version=800
+   if grep OPENSSL "$INCDIR/crypto.h" > /dev/null
+   then
+    version=920
+   fi
+  fi
+ fi
+
+ # Find the OpenSSL version header
+ if [ -f "$INCDIR/openssl/opensslv.h" ]
+ then
+  version=`grep 'SSL.*_VERSION_NUMBER.*0x' $INCDIR/openssl/opensslv.h | sed 's/.*0x0*//;s/[ 	].*//;s/L$//' | tr '[a-f]' '[A-F]'`
+ elif [ -f "$INCDIR/opensslv.h" ]
+ then
+  version=`grep 'SSL.*_VERSION_NUMBER.*0x' $INCDIR/opensslv.h | sed 's/.*0x0*//;s/[ 	].*//;s/L$//' | tr '[a-f]' '[A-F]'`
+ fi
+ if [ "$version" = "" ]
+ then
+  echo "Warning: Can't find OpenSSL version number!"
+  echo $opensslinfo
+#
+# Here we match against known OpenSSL versions
+#
+ elif [ "$version" = "90809F" ]
+ then
+  decimalversion=9470111
+  echo "Compiling with OpenSSL 0.9.8h."
+  echo "This version is old - please update".
+ elif [ "$version" = "1000200F" ]
+ then
+  decimalversion=268443663
+  echo "Compiling with OpenSSL 1.0.2F."
+ fi
+#
+# Now we try to guess about unknown versions: 
+#
+ if [ "$decimalversion" = "" ]
+ then
+  decimalversion=`echo 16i $version p | dc`
+ fi
+ if [ "$decimalversion" = "" ]
+ then
+  echo "Warning: This version: ${version} of OpenSSL is not recognized."
+  echo $opensslinfo
+ elif [ "$decimalversion" -ge "268443727" ]  # 1.0.2d 9 Jul 2015
+ then
+     echo This OpenSSL version looks good at August 2015.
+     sleep 5
+ fi
+
+ DEF="$DEF -DUSE_AES"
+ LIBDIR=
+ INCDIR=/usr/include/ncurses
+ SRCDIR=ncurses*
+ CONFIG=--enable-termcap
+ if [ "$TERMINFO" != "" ]
+ then
+  CONFIG="--datadir=$TERMINFO"
+ fi
+ if [ -d /usr/share/terminfo ]
+ then
+  CONFIG=
+ fi
+ if [ -d /usr/lib/terminfo ]
+ then
+  CONFIG=--datadir=/usr/lib/terminfo
+ fi
+
+  if [ `uname` = OpenBSD ]
+  then
+   findlib libcurses.a
+  else
+   findlib libncurses.a
+  fi
+ if [ "$found" = "" ]
+ then
+  if [ "$system" != win32 ]
+  then
+   readln "Do you want to use Mixmaster's menu-based user interface?" y
+   if [ "$ans" = "y" ]
+   then
+    echo "Please install ncurses now. It is available from http://www.clark.net/pub/dickey/ncurses/ncurses.tar.gz"
+    exit 1
+   fi
+  fi
+ else
+  DEF="$DEF -DUSE_NCURSES"
+  if [ "$type" = system -o "$type" = installed ]
+  then
+   LIBS="$LIBS $LIB"
+   LDFLAGS="$LDFLAGS $LDFLAG"
+  else
+   LIBS="$LIBS $found/lib/$lib"
+   NCURSES="$found/lib/$lib:
+	cd $found/ncurses; make ../lib/$lib"
+  fi
+  if [ "$INCDIR" != "" ]
+  then
+   INC="$INC -I$INCDIR"
+  elif [ -f "/usr/include/ncurses.h" ]
+  then
+   DEF="$DEF -DHAVE_NCURSES_H"
+  fi
+ fi
+
+ ideawarn()
+ {
+    echo "
+  NOTICE: Your version of OpenSSL has been configured without IDEA support.  That is OK.
+  "
+  sleep 5
+ }
+
+ if [ "$system" = OpenBSD ]
+ then
+  LIBDIR=
+  INCDIR=
+  SRCDIR=idea*
+  findlib libidea.a
+  if [ "$found" = "" ]
+  then
+   ideawarn
+  else
+   DEF="$DEF -DUSE_IDEA"
+   IDEALIB="$MAKELIB"
+   LIBS="$LIBS $LIB"
+   LDFLAGS="$LDFLAGS $LDFLAG"
+   if [ "$INCDIR" != "" ]
+   then
+    INC="$INC -I$INCDIR"
+   fi
+  fi
+ else
+   echo "Checking for IDEA support..."
+   cat <<END >tmptst.c
+#include <openssl/idea.h>
+int main() {
+  void *dummy;
+  dummy = idea_cfb64_encrypt;
+  exit(0);
+}
+END
+   if gcc $LDFLAGS $INC tmptst.c -o tmptst $OPENSSLLIB
+   then
+     DEF="$DEF -DUSE_IDEA"
+   else
+     ideawarn
+   fi
+   rm -f tmptst.c tmptst
+ fi
+
+ echo "testing for setenv()..."
+ cat <<END >tmptst.c
+int main() {
+#include <stdlib.h>
+ setenv("TZ", "GMT", 0);
+ exit(0);
+}
+END
+ if gcc tmptst.c -o tmptst
+ then
+   DEF="$DEF -DHAVE_SETENV"
+ fi
+ echo "done"
+ rm -f tmptst.c tmptst
+
+ SPOOL=-DSPOOL=\'\"$MIXDATA\"\'
+
+ echo "Generating Makefile."
+ echo "#Makefile generated on $HOSTNAME `date`" >Makefile
+ sed -e "s#%MIXDIR#$SPOOL#" \
+     -e "s#%LIBS#$LIBS#" \
+     -e "s#%LDFLAGS#$LDFLAGS#" \
+     -e "s#%INC#$INC#" \
+     -e "s#%DEF#$DEF#" < Makefile.in >> Makefile
+# echo "$ZLIB" >>Makefile
+# echo "$PCRE" >>Makefile
+ echo "$IDEALIB" >>Makefile
+ echo "$NCURSES" >>Makefile
+ echo "$OPENSSL" >>Makefile
+fi
+
+
+
+
+
+echo "Compiling. Please wait."
+whereis make
+make=$found
+
+if [ "$system" = win32 ]
+then
+# (cd zlib*; make libz.a)
+# (cd pcre*; make libpcre.a)
+ if [ "$PASS" != "" ]
+ then
+  $make "$PASS" dllmix
+ else
+  $make dllmix
+ fi
+else
+ if [ "$PASS" != "" ]
+ then
+  $make "$PASS"
+ else
+  $make
+ fi
+fi
+
+if [ -x mixmaster ]
+then
+ echo
+else
+ echo "Error: The compilation failed. Please consult the documentation (section
+\`Installation problems')."
+ readln "Remove the old Makefile?" y
+ if [ "$ans" = y ]
+ then
+  rm -f Makefile
+ fi
+ exit 1
+fi
+
+cp mixmaster "$MIXDESTDEB"
+
+ cd "$MIXCFG"
+ for i in adminkey.txt dest.alw *.blk
+ do
+  if [ ! -f "$MIXDATADEB/$i" ]
+  then
+   cp "$i" "$MIXDATADEB"
+  fi
+ done
+
+installed=n
+if [ -f mix.cfg ]
+then
+ if grep REMAILERADDR mix.cfg >/dev/null
+ then
+  installed=y
+ fi
+fi
+
+if [ "$installed" = "n" ]
+then
+ Date=`date`
+ whereis sendmail /usr/lib/sendmail /usr/sbin/sendmail
+ sendmail=$found
+
+ middle=n
+ RMA=mix@$HOSTNAME
+ autoreply=y
+ RAA=`echo $RMA | sed 's/.*@/nobody@/'`
+ CA=`echo $RMA | sed 's/.*@/abuse@/'`
+ RMN="Anonymous Remailer"
+ RAN=Anonymous
+
+ SN=`echo $HOSTNAME|sed 's/\..*//'`
+ mix=y
+ pgp=n
+ unencrypted=n
+ verbose=1
+ binfilter=n
+ autoblock=y
+ post=m
+ news=mail2news@dizum.com
+
+ mbox=
+ if [ -f ~/.forward ]
+ then
+  mbox=`head -1 ~/.forward | sed 's/^"//;s/"$//'`
+  if echo "$mbox" | grep 'mix' >/dev/null 2>/dev/null
+  then
+   mbox=
+  elif echo "$mbox" | grep 'procmail' >/dev/null 2>/dev/null
+  then
+   if grep mix ~/.procmailrc >/dev/null 2>/dev/null
+   then
+    mbox=
+   fi
+  fi
+ fi
+
+ cat <<END > $MIXDATADEB/mix.cfg
+# mix.cfg -- installed $Date
+SENDMAIL	$sendmail -t
+
+# Where to store non-remailer messages:
+MAILBOX		$mbox
+#MAILABUSE	mbox.abuse
+#MAILBLOCK	mbox.block
+#MAILUSAGE	mbox.usage
+#MAILANON	mbox.anon
+#MAILERROR	mbox.error
+#MAILBOUNCE	mbox.bounce
+
+REMAIL		y
+MIDDLEMAN	$middle
+
+BINFILTER	$binfilter
+AUTOBLOCK	$autoblock
+
+ERRLOG          error.log
+VERBOSE		$verbose
+
+# Remailer name and addresses
+REMAILERADDR	$RMA
+ANONADDR	$RAA
+COMPLAINTS	$CA
+
+SHORTNAME	$SN
+REMAILERNAME	$RMN
+ANONNAME	$RAN
+
+# Supported formats:
+MIX             $mix
+PGP             $pgp
+UNENCRYPTED     $unencrypted
+
+# Maximum message size in kB (0 for no limit):
+SIZELIMIT       0
+
+# Usenet news:
+NEWS		$news
+ORGANIZATION	$orga
+MID		$mid
+
+# Remailing strategy:
+SENDPOOLTIME    15m
+POOLSIZE        45
+RATE            65
+INDUMMYP        10
+OUTDUMMYP       90
+CHAIN           *,*,*,*
+IDEXP           7d
+PACKETEXP       7d
+
+SECRING ../mixkeys/secring.mix
+PASSPHRASE default_passphrase_change_me
+END
+
+fi # not yet installed under debian packaging directory
+
+REPLACE="s/%RMN/$RMN/g;s/%RMA/$RMA/g;s/%CA/$CA/g;s/%RAA/$RAA/g"
+if [ "$installed" = "n" ]
+then
+ cd "$MIXCFG"
+ if [ ! -f "$MIXDATADEB/help.txt" ]
+ then
+  sed "$REPLACE" < intro.hlp >"$MIXDATADEB/help.txt"
+  if [ "$mix" = y ]
+  then
+   sed "$REPLACE" < mix.hlp >>"$MIXDATADEB/help.txt"
+  fi
+  if [ "$unencrypted" = y ]
+  then
+   sed "$REPLACE" < type1.hlp >>"$MIXDATADEB/help.txt"
+   if [ "$pgp" = y ]
+   then
+    sed "$REPLACE" < pgp.hlp >>"$MIXDATADEB/help.txt"
+   fi
+  elif [ "$pgp" = y ]
+  then
+   sed "$REPLACE" < pgponly.hlp >>"$MIXDATADEB/help.txt"
+  fi
+  if [ "$post" = y ]
+  then
+   if [ "$pgp" = y -o "$unencrypted" = y ]
+   then
+    sed "$REPLACE" < news.hlp >>"$MIXDATADEB/help.txt"
+   fi
+  fi
+  sed "$REPLACE" < end.hlp >>"$MIXDATADEB/help.txt"
+ fi
+
+ for i in *.txt.in
+ do
+  j=`echo $i | sed 's/\.in$//'`
+  if [ ! -f "$MIXDATADEB/$j" ]
+  then
+    sed "$REPLACE" < "$i" >"$MIXDATADEB/$j"
+  fi
+ done
+fi
+
+echo "Set .forward to the following line:"
+echo "\"|${MIXDEST}/mixmaster -RM\""
+
+echo "Mixmaster preparation complete."

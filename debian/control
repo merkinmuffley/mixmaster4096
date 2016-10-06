@@ -4,10 +4,13 @@ Homepage: https://github.com/merkinmuffley/mixmaster4096
 Section: misc
 Priority: optional
 Standards-Version: 3.9.6
-Build-Depends: debhelper (>= 9), gcc (>= 4.9.2), openssl (>= 1.0.1)
+Build-Depends: debhelper (>= 9), openssl (>= 1.0.1), libpcre3 (>= 8.35-3), dc (>= 1.06.95-9), zlib1g (>= 1.2.8), libncurses5 (>= 5.9+20140913)
 
 Package: mixmaster
 Architecture: amd64
 Depends: ${misc:Depends}
 Description: anonymous mail
- both client and server
+ program is both client and server
+ package installs server in /usr/bin
+ with files in /var/mixmaster
+ and keys in /var/mixkeys

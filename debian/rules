@@ -5,19 +5,15 @@
 
 build:
 	echo BUILD
-	$(MAKE)
+	./DebianConfig
 
 clean:
 	echo CLEAN
 	dh_testdir
 	dh_testroot
 	rm -f build-stamp configure-stamp
-	$(MAKE) clean
+	cd Src && [ -f Makefile ] && $(MAKE) clean || true
 	dh_clean
 
 install:
-	echo INSTALL
-	dh_testdir
-	dh_testroot
-	dh_clean
-	dh_installdirs
+	sudo checkinstall make install
