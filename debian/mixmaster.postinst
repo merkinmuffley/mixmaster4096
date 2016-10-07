@@ -1,0 +1,21 @@
+#!/bin/sh
+set -e
+
+if [ NOUSER = NOUSER$(id -u mix 2>/dev/null) ]
+then
+    useradd -c 'mixmaster remailer' -d /var/mixmaster mix
+fi
+
+if [ ! -d /var/mixkeys ]
+then
+    mkdir /var/mixkeys
+fi
+chmod go= /var/mixkeys
+chown mix /var/mixkeys
+
+cd /var/mixmaster
+perl -pi -e 'my $fqdn=`hostname -f`; chomp($fqdn);s/build\.example\.org/$fqdn/' *
+chown mix /var/mixmaster .forward *
+
+systemctl enable mixmaster
+exit 0

@@ -16,4 +16,4 @@ clean:
 	dh_clean
 
 install:
-	sudo checkinstall make install
+	echo NOACTION sudo make install

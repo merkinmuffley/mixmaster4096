@@ -8,7 +8,7 @@ Build-Depends: debhelper (>= 9), openssl (>= 1.0.1), libpcre3 (>= 8.35-3), dc (>
 
 Package: mixmaster
 Architecture: amd64
-Depends: ${misc:Depends}
+Depends: openssl (>= 1.0.1)
 Description: anonymous mail
  program is both client and server
  package installs server in /usr/bin

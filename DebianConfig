@@ -240,6 +240,7 @@ MIXDATA=/var/mixmaster
 MIXDATADEB=`pwd`/debian$MIXDATA
 MIXKEYDIR=/var/mixkeys
 MIXKEYDIRDEB=`pwd`/debian$MIXKEYDIR
+MIXSYSTEMDDEB=`pwd`/debian/lib/systemd/system
 
 system=`uname`
 
@@ -791,7 +792,23 @@ then
  done
 fi
 
-echo "Set .forward to the following line:"
-echo "\"|${MIXDEST}/mixmaster -RM\""
+echo "\"|${MIXDEST}/mixmaster -RM\"" > $MIXDATADEB/.forward
+
+mkdir -p $MIXSYSTEMDDEB
+cat <<END >$MIXSYSTEMDDEB/mixmaster.service
+[Unit]
+Description=Mixmaster Anonymous Remailer
+After=mail-transport-agent.target
+
+[Service]
+ExecStart=/usr/bin/mixmaster -D
+User=mix
+Group=mix
+KillMode=process
+
+[Install]
+WantedBy=multi-user.target
+Alias=mixmaster.service
+END
 
 echo "Mixmaster preparation complete."
