@@ -1,0 +1,13 @@
+#!/bin/sh
+
+cd ~/github_mixmaster || exit 1
+[ -d mixmaster4096 ] || exit 1
+
+# This supposes you run it on your host with the source (need not be debian)
+# and it does ssh to the build host (running debian) named "debian84_build"
+# (at least in the host file of your source host) and makes the build there.
+# This is most convenient using one VM each for build and testing.
+
+tar cf - mixmaster4096 | ssh debian84_build 'rm -rf mixmaster* && tar xvf - && rm -rf mixmaster4096/.git && mv -i mixmaster4096 mixmaster_3.1 && tar cvzf mixmaster_3.1.orig.tar.gz mixmaster_3.1 && cd mixmaster_3.1 && export DESTDIR=/tmp/`date +%s` && dpkg-buildpackage -us -uc'
+
+# Your build host may now have a package.

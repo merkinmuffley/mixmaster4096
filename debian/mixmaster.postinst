@@ -14,7 +14,7 @@ chmod go= /var/mixkeys
 chown mix /var/mixkeys
 
 cd /var/mixmaster
-perl -pi -e 'my $fqdn=`hostname -f`; chomp($fqdn);s/build\.example\.org/$fqdn/' *
+perl -pi -e 'my $fqdn=`hostname -f`; chomp($fqdn);s/build\.example\.org/$fqdn/' *.txt mix.cfg
 chown mix /var/mixmaster .forward *
 
 systemctl enable mixmaster

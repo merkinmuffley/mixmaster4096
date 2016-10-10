@@ -1,12 +1,13 @@
 #!/bin/sh
-# Mixmaster version 3.1  --  (C) 1999-2008 Anonymizer Inc. and others.
+# Mixmaster version 3.1  --  (C) 1999-2016 Anonymizer Inc. and others.
 
 # Mixmaster may be redistributed and modified under certain conditions.
 # This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
 # ANY KIND, either express or implied. See the file COPYRIGHT for
 # details.
 
-# $Id$
+# DebianConfig is not meant for interactive use.  Run ./Install for that.
+# DebianConfig is meant to be run during "dpkg-buildpackage -us -uc".
 
 #whereis program default-path
 whereis()
@@ -241,6 +242,7 @@ MIXDATADEB=`pwd`/debian$MIXDATA
 MIXKEYDIR=/var/mixkeys
 MIXKEYDIRDEB=`pwd`/debian$MIXKEYDIR
 MIXSYSTEMDDEB=`pwd`/debian/lib/systemd/system
+MIXCRONDEB=`pwd`/debian/etc/cron.daily
 
 system=`uname`
 
@@ -694,6 +696,8 @@ then
 # mix.cfg -- installed $Date
 SENDMAIL	$sendmail -t
 
+EXTFLAGS	testing
+
 # Where to store non-remailer messages:
 MAILBOX		$mbox
 #MAILABUSE	mbox.abuse
@@ -809,6 +813,48 @@ KillMode=process
 [Install]
 WantedBy=multi-user.target
 Alias=mixmaster.service
+END
+
+cat << END > $MIXDESTDEB/mixmaster-getstats
+#!/bin/sh
+set -e
+
+cd /var/mixmaster
+
+if [ ! -f stats-src.txt ]
+then
+    echo -n mixmin > stats-src.txt
+fi
+
+if [ ! -f allpingers.txt -o allpingers.txt -ot stats-src.txt ]
+then
+    mixmaster --update-pinger-list
+fi
+
+mixmaster --update-stats 
+
+if [ -f key.txt ]
+then
+# adding key.txt to pubring.mix is useful for unknown remailers
+    while read a b keyid d
+    do
+       break
+    done < key.txt
+    grep "\$keyid" pubring.mix >/dev/null || cat key.txt >> pubring.mix
+fi
+
+[ -f mbox.2 ] && mv -f mbox.2 mbox.3
+[ -f mbox.1 ] && mv -f mbox.1 mbox.2
+[ -f mbox.0 ] && mv -f mbox.0 mbox.1
+[ -f mbox   ] && mv -f mbox   mbox.0
+exit 0
+END
+
+mkdir -p $MIXCRONDEB
+cat << END > $MIXCRONDEB/mixmaster
+#!/bin/sh
+# Mixmaster cron job gets latest stats and pubkeys.
+su - mix -c /usr/bin/mixmaster-getstats
 END
 
 echo "Mixmaster preparation complete."

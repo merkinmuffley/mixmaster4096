@@ -33,3 +33,4 @@
 /^echolot(?:1024)?[+@]/
 /^pinger[+@]/
 /^estragon(?:\+[^@]+)?@frell\.theremailer\.net$/
+/^echolot4\+/

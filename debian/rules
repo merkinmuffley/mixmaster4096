@@ -2,7 +2,6 @@
 %:
 	dh $@
 
-
 build:
 	echo BUILD
 	./DebianConfig
@@ -16,4 +15,4 @@ clean:
 	dh_clean
 
 install:
-	echo NOACTION sudo make install
+	echo NOACTION
