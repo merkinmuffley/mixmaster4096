@@ -33,6 +33,7 @@ Libraries:
 
   Mixmaster requires the libraries OpenSSL, zlib, and pcre. 
   If libraries are provided by packages for your OS that's probably your best plan.
+  If using Debian consult the file debian/control; the "Build-Depends" line.
   
   If you want to use the menu-based user interface, you also need the ncurses
   library. If these libraries are not installed on your system, you will need
