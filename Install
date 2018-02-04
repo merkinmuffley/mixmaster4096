@@ -945,7 +945,7 @@ y)es, post locally; use m)ail-to-news gateway; n)o."
    mid=$ans
   elif [ "$ans" = m ]
   then
-   readln "Mail-to-news gateway:" mail2news@nym.alias.net
+   readln "Mail-to-news gateway:" mail2news@m2n.mixmin.net
    news=$ans
   fi
  fi
