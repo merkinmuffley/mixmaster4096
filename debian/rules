@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+%:
+	dh $@
+
+build:
+	echo BUILD
+	./DebianConfig
+
+clean:
+	echo CLEAN
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp configure-stamp
+	cd Src && [ -f Makefile ] && $(MAKE) clean || true
+	dh_clean
+
+install:
+	echo NOACTION

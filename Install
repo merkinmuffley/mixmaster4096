@@ -1,5 +1,5 @@
 #!/bin/sh
-# Mixmaster version 3.0  --  (C) 1999-2008 Anonymizer Inc. and others.
+# Mixmaster version 3.1  --  (C) 1999-2016 Anonymizer Inc. and others.
 
 # Mixmaster may be redistributed and modified under certain conditions.
 # This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
@@ -945,7 +945,7 @@ y)es, post locally; use m)ail-to-news gateway; n)o."
    mid=$ans
   elif [ "$ans" = m ]
   then
-   readln "Mail-to-news gateway:" mail2news@nym.alias.net
+   readln "Mail-to-news gateway:" mail2news@m2n.mixmin.net
    news=$ans
   fi
  fi

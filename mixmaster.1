@@ -150,9 +150,8 @@ only useful together with \fB--daemon\fP).
 .B -G, \-\-generate\-key
 Generate a new remailer key.  RSA key sizes 1024, 2048, 3072 and 4096 are possible (--size=2048).
 Key lifetime in days may be specified (--lifetime=ndays).  Expired secret keys are
-automatically deleted next time mixmaster runs.  Some balance should be sought between
-having high turnover with concurrent keys (e.g. daily generation of --lifetime=14) and 
-having keys of long lifetime not quickly destroyed.
+automatically deleted next time mixmaster runs.  Size 4096 is best then 1024; the
+other sizes have no advantages.
 
 .TP
 .B \-K, \-\-update\-keys

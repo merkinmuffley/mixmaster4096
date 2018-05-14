@@ -1,4 +1,4 @@
-/* Mixmaster version 3.0  --  (C) 1999 - 2008 Anonymizer Inc. and others.
+/* Mixmaster version 3.1 --  (C) 1999 - 2008 Anonymizer Inc. and others.
 
    Mixmaster may be redistributed and modified under certain conditions.
    This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
@@ -262,6 +262,7 @@ extern char DSAPARAMS[];
 extern char DHPARAMS[];
 extern char MIXRAND[];
 extern char SECRING[];
+extern char SECRINGNEW[];
 extern char PUBRING[];
 extern char IDLOG[];
 extern char STATS[];

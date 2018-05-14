@@ -1,0 +1,16 @@
+Source: mixmaster
+Maintainer: Merkin Muffley <merkinmuffley@github.com>
+Homepage: https://github.com/merkinmuffley/mixmaster4096
+Section: misc
+Priority: optional
+Standards-Version: 3.9.6
+Build-Depends: build-essential, debhelper (>= 9), openssl (>= 1.0.1), libpcre3-dev, dc, zlib1g (>= 1.2.8), libncurses5-dev, libssl-dev, bison
+
+Package: mixmaster
+Architecture: amd64
+Depends: openssl (>= 1.0.1), curl, perl, login, cron, libpcre3, zlib1g, libncurses5, ssl-cert
+Description: anonymous mail
+ program is both client and server
+ package installs server in /usr/bin
+ with files in /var/mixmaster
+ and private keys in /var/mixkeys

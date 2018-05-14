@@ -1,4 +1,4 @@
-/* Mixmaster version 3.0  --  (C) 1999 - 2006 Anonymizer Inc. and others.
+/* Mixmaster version 3.1 --  (C) 1999 - 2016 Anonymizer Inc. and others.
 
    Mixmaster may be redistributed and modified under certain conditions.
    This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
@@ -454,9 +454,11 @@ int deleteoldkeys(void)
     keyring = mix_openfile(SECRING, "r");
     if (!keyring)
         return -1;
-    newsecring = mix_openfile("secring.mix.new", "w");
-    if (!newsecring)
+    newsecring = mix_openfile(SECRINGNEW, "w");
+    if (!newsecring) {
+        errlog(ERRORMSG, "Unable to create new secring: %s\n", SECRINGNEW);
         return -1;
+    }
 
     while (res) {
         linecount++;
@@ -508,9 +510,10 @@ int deleteoldkeys(void)
     /* replace the file and wipe the old one */
     keyring = mix_openfile(SECRING, "r+");
     {
-    /* rename the "secring.mix.new" in the MIXDIR not CWD */
+    /* rename SECRINGNEW to SECRING */
     char path1[PATHMAX], path2[PATHMAX];
-    mixfile(path1, "secring.mix.new");
+    errlog(LOG, "Renaming %s to %s.\n", SECRINGNEW, SECRING);
+    mixfile(path1, SECRINGNEW);
     mixfile(path2, SECRING);
     if (rename(path1, path2)) return -14;
     }

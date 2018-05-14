@@ -1,5 +1,5 @@
-Mixmaster 3.0 -- anonymous remailer software -- (C) 1999 - 2000 Anonymizer Inc.
-                                  (C) 2000-2014 The Mixmaster Development Team
+Mixmaster 3.1 -- anonymous remailer software -- (C) 1999 - 2000 Anonymizer Inc.
+                                  (C) 2000-2016 The Mixmaster Development Team
 -------------------------------------------------------------------------------
 
 This program consists of
@@ -8,7 +8,8 @@ This program consists of
 
   The remailer client supports sending anonymous mail using Cypherpunk and
   Mixmaster remailers. It supports OpenPGP encryption (compatible with PGP 2,
-  PGP 5 and up, and GnuPG).
+  PGP 5 and up, and GnuPG). In fact we're getting doubtful about the range
+  of compatibility now but GnuPG definitely works with most remailers.
 
   The client can be used with a menu-based user interface and with command line
   options.
@@ -31,6 +32,8 @@ Installation:
 Libraries:
 
   Mixmaster requires the libraries OpenSSL, zlib, and pcre. 
+  If libraries are provided by packages for your OS that's probably your best plan.
+  If using Debian consult the file debian/control; the "Build-Depends" line.
   
   If you want to use the menu-based user interface, you also need the ncurses
   library. If these libraries are not installed on your system, you will need

@@ -1,4 +1,4 @@
-/* Mixmaster version 3.0  --  (C) 1999 - 2006 Anonymizer Inc. and others.
+/* Mixmaster version 3.1 --  (C) 1999 - 2016 Anonymizer Inc. and others.
 
    Mixmaster may be redistributed and modified under certain conditions.
    This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF
@@ -57,6 +57,7 @@ char DSAPARAMS[PATHMAX];
 char DHPARAMS[PATHMAX];
 char MIXRAND[PATHMAX];
 char SECRING[PATHMAX];
+char SECRINGNEW[PATHMAX];
 char PUBRING[PATHMAX];
 char IDLOG[PATHMAX];
 char STATS[PATHMAX];
@@ -740,6 +741,9 @@ int mix_config(void)
     fclose(f);
   }
 
+  /* set SECRINGNEW after reading SECRING from cfg file */
+  strncpy(SECRINGNEW, SECRING, PATHMAX);
+  strncat(SECRINGNEW, ".new", PATHMAX); SECRINGNEW[PATHMAX-1]='\0';
   mixfile(POOLDIR, POOL); /* set POOLDIR after reading POOL from cfg file */
   if (POOLDIR[strlen(POOLDIR) - 1] == DIRSEP)
     POOLDIR[strlen(POOLDIR) - 1] = '\0';

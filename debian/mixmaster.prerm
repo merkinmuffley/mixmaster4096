@@ -1,0 +1,17 @@
+#!/bin/sh
+set -e
+
+systemctl disable mixmaster
+
+if [ -f /var/mixmaster/mixmaster.pid ]
+then
+    su - mix -c 'kill $(cat /var/mixmaster/mixmaster.pid)'
+fi
+
+if [ -f /var/mixkeys/secring.mix ]
+then
+    dd if=/dev/zero of=/var/mixkeys/secring.mix count=16
+    rm -f /var/mixkeys/secring.mix
+    rmdir /var/mixkeys
+fi
+exit 0
