@@ -236,7 +236,7 @@ int mix2_decrypt(BUFFER *m)
       * -2: old message */
 {
   int err = 0;
-  int i,rsalen,rsalen_as_byte,use_cfb=0;
+  int i,rsalen,rsalen_as_byte;
   BUFFER *privkey;
   BUFFER *keyid;
   BUFFER *dec, *deskey;
@@ -300,36 +300,18 @@ int mix2_decrypt(BUFFER *m)
         rsalen_as_byte=1;
         rsalen=128;
         break;
-      case 2:
-        rsalen_as_byte=2;
-        rsalen=256;
-        use_cfb=1;
-        break;
-      case 3:
-        rsalen_as_byte=3;
-        rsalen=384;
-        use_cfb=1;
-        break;
-      case 4:
-        rsalen_as_byte=4;
-        rsalen=512;
-        use_cfb=1;
-        break;
 /* New options in v3.0.3 using CTR mode */
       case 5:
         rsalen_as_byte=2;
         rsalen=256;
-        use_cfb=0;
         break;
       case 6:
         rsalen_as_byte=3;
         rsalen=384;
-        use_cfb=0;
         break;
       case 7:
         rsalen_as_byte=4;
         rsalen=512;
-        use_cfb=0;
         break;
       default:
         err = -1;
@@ -397,12 +379,7 @@ int mix2_decrypt(BUFFER *m)
       derive_aes_keys(aes_pre_key, hkey,
                       aes_header_key, aes_body_key, aes_tte_key,
 		      aes_iv, aes_body_iv, aes_header_iv);
-     if (use_cfb) {
-         /* CFB and a single IV */
-         buf_aescrypt(dec, aes_tte_key, aes_iv, DECRYPT);
-     } else {
-         buf_aes_ctr128(dec, aes_tte_key, aes_iv);
-     }
+      buf_aes_ctr128(dec, aes_tte_key, aes_iv);
   }
 
   buf_crypt(dec, deskey, iv, DECRYPT);
@@ -476,20 +453,10 @@ int mix2_decrypt(BUFFER *m)
      buf_append(trail, m->data + 512, 19*512);
   } else {
      /* and AES */
-     if (use_cfb) {
-         /* CFB and a single IV */
-         buf_aescrypt(body, aes_body_key, aes_iv, DECRYPT);
-     } else {
-         buf_aes_ctr128(body, aes_body_key, aes_body_iv);
-     }
+     buf_aes_ctr128(body, aes_body_key, aes_body_iv);
  
      buf_append(trail, m->data + 2*512, 19*512);
-     if (use_cfb) {
-         /* CFB and a single IV */
-         buf_aescrypt(trail, aes_header_key, aes_iv, DECRYPT);
-     } else {
-         buf_aes_ctr128(trail, aes_header_key, aes_header_iv);
-     }
+     buf_aes_ctr128(trail, aes_header_key, aes_header_iv);
   }
 
   switch (type) {
